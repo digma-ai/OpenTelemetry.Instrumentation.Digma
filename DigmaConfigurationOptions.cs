@@ -24,5 +24,6 @@ namespace OpenTelemetry.Instrumentation.Digma
         public string? Environment { get; set; } = null;
         public string CommitIdEnvVariable { get; set; } = DEFAULT_COMMIT_ENV_VAR;
         public string EnvironmentEnvVariable { get; set; } = DEFAULT_ENV_ENV_VAR;
+        public string? CommitId { get; set; } = null;
     }
 }

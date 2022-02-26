@@ -35,9 +35,9 @@ public static class DigmaInstrumentationHelperExtensions
             options.NamespaceRoot = stackTrace?.GetFrame(1)?.GetMethod()?.DeclaringType?.Namespace ?? "";
         }
 
-        if (options.Environment == null)
+        if (options.CommitId == null)
         {
-            options.Environment = Environment.GetEnvironmentVariable(options.CommitIdEnvVariable) ?? "";
+            options.CommitId = Environment.GetEnvironmentVariable(options.CommitIdEnvVariable) ?? "";
         }
 
         if (options.Environment == null)
@@ -47,9 +47,9 @@ public static class DigmaInstrumentationHelperExtensions
 
 
 
-        builder.AddAttributes(new[] {   new KeyValuePair<string, object>("deployment.environment", "Dev"),
+        builder.AddAttributes(new[] {   new KeyValuePair<string, object>("deployment.environment", options.Environment),
                                         new KeyValuePair<string, object>("paths.working_directory", workingDirectory),
-                                        new KeyValuePair<string, object>("commitId", options.Environment),
+                                        new KeyValuePair<string, object>("commitId", options.CommitId),
                                         new KeyValuePair<string, object>("namespaces.this_namespace_root", options.NamespaceRoot),
                                         new KeyValuePair<string, object>("telemetry.sdk.language", "CSharp") });
 
