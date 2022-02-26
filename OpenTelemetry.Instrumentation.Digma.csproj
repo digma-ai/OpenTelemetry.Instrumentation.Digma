@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>OpenTelemetry_Instrumentation_Digma</PackageId>
+    <Version>0.0.1</Version>
+    <Authors>Digma Team</Authors>
+    <Company>Digma</Company>
+    <TargetFramework>net6.0</TargetFramework>
+
+    <RootNamespace>OpenTelemetry.Instrumentation.Digma</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="OpenTelemetry" Version="1.2.0-rc2" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.0.0-rc*" />
+  </ItemGroup>
+
+</Project>
