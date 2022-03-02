@@ -21,20 +21,12 @@ namespace OpenTelemetry.Instrumentation.Digma;
 using System.Diagnostics;
 using OpenTelemetry.Resources;
 
-<<<<<<< HEAD
-public static class DigmaInstrumentationHelperExtensions
-{
-    public static ResourceBuilder AddDigmaAttributes(this ResourceBuilder builder,
-                                                     Action<DigmaConfigurationOptions> configure = null
-    )
-=======
 public static class DigmaInstrumentationHelperExtensions
 {
     private static readonly HashSet<string> IgnoreNamespaces = new() {"Microsoft", "System"};
 
     public static ResourceBuilder AddDigmaAttributes(this ResourceBuilder builder,
                                                      Action<DigmaConfigurationOptions> configure = null)
->>>>>>> cf8bc519cb2b4e1013ea6073dc06b8eb5f60a6cd
     {
         var workingDirectory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
 
