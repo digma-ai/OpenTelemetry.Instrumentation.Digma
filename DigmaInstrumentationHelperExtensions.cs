@@ -21,12 +21,17 @@ using OpenTelemetry.Resources;
 public static class DigmaInstrumentationHelperExtensions
 {
     public static ResourceBuilder AddDigmaAttributes(this ResourceBuilder builder,
-                                                     Action<DigmaConfigurationOptions> configure = null)
+                                                     Action<DigmaConfigurationOptions> configure = null
+    )
     {
         var workingDirectory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
 
         DigmaConfigurationOptions options = new DigmaConfigurationOptions();
-        configure(options);
+        if (configure != null)
+        {
+            configure(options);
+
+        }
 
         //If namespace not provided try to get it from the calling method
         if (options.NamespaceRoot == null) { 
@@ -48,7 +53,7 @@ public static class DigmaInstrumentationHelperExtensions
 
 
         builder.AddAttributes(new[] {   new KeyValuePair<string, object>("deployment.environment", options.Environment),
-                                        new KeyValuePair<string, object>("paths.working_directory", workingDirectory),
+                                        new KeyValuePair<string, object>("paths.working_directory", workingDirectory), 
                                         new KeyValuePair<string, object>("commitId", options.CommitId),
                                         new KeyValuePair<string, object>("namespaces.this_namespace_root", options.NamespaceRoot),
                                         new KeyValuePair<string, object>("telemetry.sdk.language", "CSharp") });
