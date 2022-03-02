@@ -13,16 +13,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // </copyright>
+
+using System.Reflection;
+
 namespace OpenTelemetry.Instrumentation.Digma;
 
 using System.Diagnostics;
 using OpenTelemetry.Resources;
 
+<<<<<<< HEAD
 public static class DigmaInstrumentationHelperExtensions
 {
     public static ResourceBuilder AddDigmaAttributes(this ResourceBuilder builder,
                                                      Action<DigmaConfigurationOptions> configure = null
     )
+=======
+public static class DigmaInstrumentationHelperExtensions
+{
+    private static readonly HashSet<string> IgnoreNamespaces = new() {"Microsoft", "System"};
+
+    public static ResourceBuilder AddDigmaAttributes(this ResourceBuilder builder,
+                                                     Action<DigmaConfigurationOptions> configure = null)
+>>>>>>> cf8bc519cb2b4e1013ea6073dc06b8eb5f60a6cd
     {
         var workingDirectory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
 
@@ -34,10 +46,19 @@ public static class DigmaInstrumentationHelperExtensions
         }
 
         //If namespace not provided try to get it from the calling method
-        if (options.NamespaceRoot == null) { 
+        if (string.IsNullOrEmpty(options.NamespaceRoot)) { 
 
             StackTrace stackTrace = new StackTrace();
             options.NamespaceRoot = stackTrace?.GetFrame(1)?.GetMethod()?.DeclaringType?.Namespace ?? "";
+        }
+        if (string.IsNullOrEmpty(options.NamespaceRoot))
+        {
+            options.NamespaceRoot = Assembly.GetCallingAssembly().GetTypes()
+                .Where(x => x.Namespace != null)
+                .Select(x => x.Namespace!.Split('.').First())
+                .Except(IgnoreNamespaces)
+                .Distinct()
+                .FirstOrDefault();
         }
 
         if (options.CommitId == null)
@@ -62,4 +83,5 @@ public static class DigmaInstrumentationHelperExtensions
 
      }
 
+    
 }
