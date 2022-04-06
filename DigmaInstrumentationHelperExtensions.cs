@@ -69,7 +69,7 @@ public static class DigmaInstrumentationHelperExtensions
                                         new KeyValuePair<string, object>("paths.working_directory", workingDirectory), 
                                         new KeyValuePair<string, object>("commitId", options.CommitId),
                                         new KeyValuePair<string, object>("namespaces.this_namespace_root", options.NamespaceRoot),
-                                        new KeyValuePair<string, object>("telemetry.sdk.language", "CSharp") });
+                                        new KeyValuePair<string, object>("telemetry.sdk.language", "dotnet") });
 
         return builder;
 
