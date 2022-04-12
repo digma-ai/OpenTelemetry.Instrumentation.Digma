@@ -70,7 +70,6 @@ public static class DigmaInstrumentationHelperExtensions
                                         new KeyValuePair<string, object>("scm.commit.id", options.CommitId),
                                         new KeyValuePair<string, object>("code.namespace.root", options.NamespaceRoot)
                                         }); 
-
         return builder;
 
      }
