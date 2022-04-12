@@ -102,8 +102,8 @@ public static class EndpointMonitoring
             if (descriptor == null)
                 return;
 
-            Activity.Current?.AddTag("endpoint.classFullPath", descriptor.MethodInfo.DeclaringType?.ToString());
-            Activity.Current?.AddTag("endpoint.methodName", descriptor.MethodInfo.Name);
+            Activity.Current?.AddTag("endpoint.type_full_name", descriptor.MethodInfo.DeclaringType?.ToString());
+            Activity.Current?.AddTag("endpoint.function", descriptor.MethodInfo.Name);
         }
     }
 }

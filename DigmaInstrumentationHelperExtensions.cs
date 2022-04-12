@@ -66,10 +66,10 @@ public static class DigmaInstrumentationHelperExtensions
 
 
         builder.AddAttributes(new[] {   new KeyValuePair<string, object>("deployment.environment", options.Environment),
-                                        new KeyValuePair<string, object>("paths.working_directory", workingDirectory), 
-                                        new KeyValuePair<string, object>("commitId", options.CommitId),
-                                        new KeyValuePair<string, object>("namespaces.this_namespace_root", options.NamespaceRoot),
-                                        new KeyValuePair<string, object>("telemetry.sdk.language", "CSharp") });
+                                        new KeyValuePair<string, object>("paths.working_directory", workingDirectory),
+                                        new KeyValuePair<string, object>("scm.commit.id", options.CommitId),
+                                        new KeyValuePair<string, object>("code.namespace.root", options.NamespaceRoot)
+                                        }); 
 
         return builder;
 
