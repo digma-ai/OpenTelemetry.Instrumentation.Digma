@@ -20,6 +20,20 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
+      
+      - name: Get tag
+        id: tag
+        uses: dawidd6/action-get-tag@v1
+        with:
+          # Optionally strip `v` prefix
+          strip_v: true
+
+      - name: update version in csproj
+        id: package_version
+        uses: KageKirin/set-csproj-version@v0
+        with:
+          file: ./OpenTelemetry.Instrumentation.Digma.csproj
+          version: ${{ steps.tag.outputs.tag }}
 
       # Runs a single command using the runners shell
       - name: Publish NuGet
@@ -30,4 +44,6 @@ jobs:
           # Useful with external providers like Nerdbank.GitVersioning, ignores VERSION_FILE_PATH & VERSION_REGEX
            # API key to authenticate with NuGet server
           NUGET_KEY:  ${{ secrets.NUGET_PAT }}
+          VERSION_STATIC: ${{ steps.tag.outputs.tag }}
+          TAG_COMMIT: false
   
