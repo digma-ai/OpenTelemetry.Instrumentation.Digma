@@ -34,7 +34,7 @@ jobs:
         id: package_version
         uses: KageKirin/set-csproj-version@v0
         with:
-          file: $ProjectFile
+          file: env.ProjectFile
           version: ${{ steps.tag.outputs.tag }}
 
       # Runs a single command using the runners shell
