@@ -58,7 +58,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./bin/release/OpenTel.Instrumentation.Digma.${{ steps.tag.outputs.tag }}.nupkg
+          file: ./bin/Release/OpenTel.Instrumentation.Digma.${{ steps.tag.outputs.tag }}.nupkg
           asset_name: digma.vsix
           tag: ${{ github.ref }}
           overwrite: true
