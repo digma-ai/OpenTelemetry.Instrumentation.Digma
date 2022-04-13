@@ -40,11 +40,29 @@ jobs:
       # Runs a single command using the runners shell
       
       - name: Package
-        run: dotnet pack -c Release -o $ProjectFile
+        run: dotnet pack -c Release
         
       - name: Publish
-        run: dotnet nuget push *.nupkg -k ${{ secrets.NUGET_PAT }} -s https://api.nuget.org/v3/index.json
+        run: dotnet nuget push ./bin/release/*.nupkg -k ${{ secrets.NUGET_PAT }} -s https://api.nuget.org/v3/index.json
       
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ${{ steps.publishToMarketplace.outputs.vsixPath }}
+          asset_name: digma.vsix
+          tag: ${{ github.ref }}
+          overwrite: true
+          
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ./bin/release/OpenTel.Instrumentation.Digma.${{ steps.tag.outputs.tag }}.nupkg
+          asset_name: digma.vsix
+          tag: ${{ github.ref }}
+          overwrite: true
+          
       - name: commit new version file
         uses: stefanzweifel/git-auto-commit-action@v4.14.0
         with:
