@@ -43,7 +43,7 @@ jobs:
         run: dotnet pack -c Release
         
       - name: Publish
-        run: dotnet nuget push ./bin/release/*.nupkg -k ${{ secrets.NUGET_PAT }} -s https://api.nuget.org/v3/index.json
+        run: dotnet nuget push ./bin/Release/*.nupkg -k ${{ secrets.NUGET_PAT }} -s https://api.nuget.org/v3/index.json
       
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
