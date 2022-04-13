@@ -33,7 +33,7 @@ While the instrumentation will try to automatically collect relevant information
 | ```Environment``` | The Environment describes where the running process is deployed. (e.g production, staging, ci)  | Ths instrumentation will attempt to read it from an environment variable. Empty value is 'UNSET' | False |
 | ```EnvironmentEnvVariable``` | The environment variable name that will be used to check the Environment of the running process to tag the observability data | 'DEPLOYMENT_ENVIORNMENT'| False|
 | ```CommitId``` | The specific commit identifier of the running code. | The instrumentation will attempt to read this variable from an environment variable, which can be injected by the CI | False |
-| ```CommitIdEnvVariable``` | The environment variable used to store the commit identifer | 'DEPLOYMENT_COMMIT_ID' |
+| ```CommitIdEnvVariable``` | The environment variable used to store the commit identifer | 'DEPLOYMENT_COMMIT_ID' | False |
 
 ### Usage Example
 
