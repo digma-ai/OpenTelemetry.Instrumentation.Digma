@@ -10,6 +10,7 @@ To read more about why you would do that, check out the [Digma](https://github.c
 Here is a simple example of including the Digma instrumentation in the OTEL tracing configuration:
 
 ```csharp
+builder.Services.AddEndpointMonitoring();
 builder.Services.AddOpenTelemetryTracing(
     builder => builder
         .AddAspNetCoreInstrumentation(options =>{options.RecordException = true;})
