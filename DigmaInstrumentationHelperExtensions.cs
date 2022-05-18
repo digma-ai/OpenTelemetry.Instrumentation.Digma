@@ -70,6 +70,8 @@ public static class DigmaInstrumentationHelperExtensions
             new KeyValuePair<string, object>("scm.commit.id", options.CommitId),
             new KeyValuePair<string, object>("code.namespace.root", options.NamespaceRoot),
             new KeyValuePair<string, object>("host.name", Environment.MachineName),
+            new KeyValuePair<string, object>("digma.span_mapping_pattern", options.SpanMappingPattern),
+            new KeyValuePair<string, object>("digma.span_mapping_replacement", options.SpanMappingReplacement),
         });
         return builder;
     }
