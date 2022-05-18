@@ -34,15 +34,15 @@ public static class DigmaInstrumentationHelperExtensions
         if (configure != null)
         {
             configure(options);
-
         }
 
         //If namespace not provided try to get it from the calling method
-        if (string.IsNullOrEmpty(options.NamespaceRoot)) { 
-
+        if (string.IsNullOrEmpty(options.NamespaceRoot))
+        {
             StackTrace stackTrace = new StackTrace();
             options.NamespaceRoot = stackTrace?.GetFrame(1)?.GetMethod()?.DeclaringType?.Namespace ?? "";
         }
+
         if (string.IsNullOrEmpty(options.NamespaceRoot))
         {
             options.NamespaceRoot = Assembly.GetCallingAssembly().GetTypes()
@@ -63,18 +63,14 @@ public static class DigmaInstrumentationHelperExtensions
             options.Environment = Environment.GetEnvironmentVariable(options.EnvironmentEnvVariable) ?? "UNSET_ENV";
         }
 
-
-
-        builder.AddAttributes(new[] {   new KeyValuePair<string, object>("deployment.environment", options.Environment),
-                                        new KeyValuePair<string, object>("paths.working_directory", workingDirectory),
-                                        new KeyValuePair<string, object>("scm.commit.id", options.CommitId),
-                                        new KeyValuePair<string, object>("code.namespace.root", options.NamespaceRoot),
-                                        new KeyValuePair<string, object>("host.name", Environment.MachineName)
-
-                                        }); 
+        builder.AddAttributes(new[]
+        {
+            new KeyValuePair<string, object>("deployment.environment", options.Environment),
+            new KeyValuePair<string, object>("paths.working_directory", workingDirectory),
+            new KeyValuePair<string, object>("scm.commit.id", options.CommitId),
+            new KeyValuePair<string, object>("code.namespace.root", options.NamespaceRoot),
+            new KeyValuePair<string, object>("host.name", Environment.MachineName),
+        });
         return builder;
-
-     }
-
-    
+    }
 }
