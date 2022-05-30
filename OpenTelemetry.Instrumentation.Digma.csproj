@@ -15,9 +15,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="LICENSE" Pack="true" PackagePath="LICENSE"/>
-    <PackageReference Include="OpenTelemetry" Version="1.2.0"/>
-    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.0.0-rc9.2"/>
+    <None Include="LICENSE" Pack="true" PackagePath="LICENSE" />
+    <PackageReference Include="OpenTelemetry" Version="1.2.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.0.0-rc9.2" />
   </ItemGroup>
 
 </Project>
