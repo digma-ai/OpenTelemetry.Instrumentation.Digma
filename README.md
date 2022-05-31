@@ -2,8 +2,17 @@
 
 # OpenTelemetry-Instrumentation-Digma
 
-This nuget package contains additional OTEL attributes instrumentation.
-These additiona attributes provide context on code locations which then make it possible to map insights derived from the observability, back to source code objects.
+This nuget package contains several instrumentation helpers for OpenTelemetry.
+
+[Digram Instrumentation helpers](#digma_instrumentation) 
+
+[TracingDecorator](#tracingdecorator) 
+
+
+<a name="digma_instrumentation"/>
+
+## Digram Instrumentation helpers
+The instrumentation helpers allow injecting spans with an aditional set of span attributes which provide context on code locations which then make it possible to map insights derived from the observability, back to source code objects.
 
 To read more about why you would do that, check out the [Digma](https://github.com/digma-ai/digma) repo.
 
@@ -41,3 +50,30 @@ While the instrumentation will try to automatically collect relevant information
 ### Usage Example
 
 To see a working end-to-end example, check out our DotNet [sample application repo](https://github.com/digma-ai/otel-sample-application-dotnet). 
+
+<a name="tracingdecorator"/>
+
+## Tracing Decorator
+
+The TracingDecorator class allows automatically instrumenting a given interface's methods. 
+Interceptors have their pros and cons, please avoid using this class with performance sentitive short lived operations.
+
+### Setup:
+Create an instance of the decorator. The static constructor accepts as a parameter the concrete object you want to decorate:
+```csharp
+decoratedProxy = TraceDecorator<IInterfaceDecorated>.Create(actualIntance)
+```
+You can easily inject your decorator into the DI by using the [Scrutor](https://www.nuget.org/packages/Scrutor/) package.
+For example:
+```csharp
+builder.Services.Decorate<IInterfaceDecorated>((decorated) =>
+    TraceDecorator<IInterfaceDecorated>.Create(decorated));
+```
+
+#### TraceDecorator Create parameters:
+| Parameter | Type |Description | Default Value | Mandatory |
+| ------ | ----------- | ------------- |-----------|--------|
+| ```decorated``` | TDecorated | The object to decorate with auto-instrumentation behavior | null | True |
+| ```activityNamingSchema``` | IActivityNamingSchema? | The naming schema that will be used to automatically name spans. You can add your own naming schemas based on convention | ```MethodFullNameSchema``` | False |
+| ```decorateAllMethods``` | bool | Whether to automatically decorate all of the interface operations | ```true``` | False |
+
