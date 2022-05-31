@@ -1,4 +1,4 @@
-![NuGet Status](https://img.shields.io/nuget/v/OpenTel.Instrumentation.Digma.svg?style=plastic)](https://www.nuget.org/packages/OpenTel.Instrumentation.Digma/)
+[![NuGet Status](https://img.shields.io/nuget/v/OpenTel.Instrumentation.Digma.svg?style=plastic)](https://www.nuget.org/packages/OpenTel.Instrumentation.Digma/)
 
 # OpenTelemetry-Instrumentation-Digma
 
