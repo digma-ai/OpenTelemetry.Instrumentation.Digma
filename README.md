@@ -1,4 +1,6 @@
-﻿# OpenTelemetry-Instrumentation-Digma
+[https://img.shields.io/nuget/v/OpenTel.Instrumentation.Digma.svg?style=plastic](https://www.nuget.org/packages/OpenTel.Instrumentation.Digma/)
+
+# OpenTelemetry-Instrumentation-Digma
 
 This nuget package contains additional OTEL attributes instrumentation.
 These additiona attributes provide context on code locations which then make it possible to map insights derived from the observability, back to source code objects.
