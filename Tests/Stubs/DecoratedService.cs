@@ -9,6 +9,9 @@ public interface IDecoratedService
 
     public Task AsyncMethodExplicitlyMarkedForTracing(Action stateValidation);
     
+    public void MethodNotExplicitlyMarkedForTracing(Action stateValidation);
+
+    
 }
 
 public class DecoratedService : IDecoratedService
@@ -27,5 +30,9 @@ public class DecoratedService : IDecoratedService
         stateValidation();
 
     }
-    
+
+    public void MethodNotExplicitlyMarkedForTracing(Action stateValidation)
+    {
+        stateValidation();
+    }
 }

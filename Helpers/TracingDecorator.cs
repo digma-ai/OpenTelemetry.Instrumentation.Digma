@@ -65,7 +65,7 @@ public class TraceDecorator<TDecorated> : DispatchProxy where TDecorated : class
         var noActivityAttribute = targetMethod.GetCustomAttribute<NoActivityAttribute>(false);
         var activityAttribute = targetMethod.GetCustomAttribute<TraceActivityAttribute>(false);
 
-        if (noActivityAttribute == null || (!_decorateAllMethods && activityAttribute==null))
+        if (noActivityAttribute == null && (_decorateAllMethods || activityAttribute!=null))
         {
             var defaultSpanName = _namingSchema.GetSpanName(_decorated!.GetType(), targetMethod);
             using var activity = _activity.StartActivity(activityAttribute?.Name ?? defaultSpanName);
