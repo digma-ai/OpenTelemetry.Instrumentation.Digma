@@ -37,10 +37,6 @@ jobs:
           file: ${{ env.ProjectFile }}
           version: ${{ steps.tag.outputs.tag }}
 
-      # Runs a single command using the runners shell
-      - name: Build
-        run: dotnet build -c Release
-   
       - name: Package
         run: dotnet pack -c Release
         
