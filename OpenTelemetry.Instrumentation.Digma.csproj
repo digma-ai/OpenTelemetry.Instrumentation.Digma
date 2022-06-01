@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <IsPackable>true</IsPackable>
     <PackageId>OpenTel.Instrumentation.Digma</PackageId>
     <Version>0.5.9</Version>
     <Authors>Digma Team</Authors>
