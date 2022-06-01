@@ -77,3 +77,9 @@ builder.Services.Decorate<IInterfaceDecorated>((decorated) =>
 | ```activityNamingSchema``` | IActivityNamingSchema? | The naming schema that will be used to automatically name spans. You can add your own naming schemas based on convention | ```MethodFullNameSchema``` | False |
 | ```decorateAllMethods``` | bool | Whether to automatically decorate all of the interface operations | ```true``` | False |
 
+### Setting span preferences with attributes:
+You can use the ```TraceActivity``` attribute to set specific span preferences, or if you're using the TraceDecorator with the ```decorateAllMethods``` parameter set to false: declare which methods should be instrumented.
+
+<img width="795" alt="image" src="https://user-images.githubusercontent.com/93863/171303020-78206ba1-230f-4519-9fa0-6d8f33938be3.png">
+
+
