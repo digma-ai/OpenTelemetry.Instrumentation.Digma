@@ -10,26 +10,26 @@ public class TraceDecorator<TDecorated> : DispatchProxy where TDecorated : class
     
     private ActivitySource _activity;
     private TDecorated _decorated;
-    private ISpanNamingSchema _namingSchema = new MethodFullNameSchema();
+    private IActivityNamingSchema _namingSchema = new MethodFullNameSchema();
     private bool _decorateAllMethods = true;
 
     /// <summary>
     /// Creates a new TraceDecorator instance wrapping the specific object and implementing the TDecorated interface 
     /// </summary>
     /// <param name="decorated"></param>
-    /// <param name="spanNamingSchema"></param>
+    /// <param name="activityNamingSchema"></param>
     /// <param name="decorateAllMethods"></param>
     /// <returns></returns>
-    public static TDecorated Create(TDecorated decorated, ISpanNamingSchema? spanNamingSchema=null, 
+    public static TDecorated Create(TDecorated decorated, IActivityNamingSchema? activityNamingSchema=null, 
                                     bool decorateAllMethods=true)
     {
         object proxy = Create<TDecorated, TraceDecorator<TDecorated>>()!;
-        ((TraceDecorator<TDecorated>)proxy!).SetParameters(decorated, spanNamingSchema,decorateAllMethods);
+        ((TraceDecorator<TDecorated>)proxy!).SetParameters(decorated, activityNamingSchema,decorateAllMethods);
 
         return (TDecorated)proxy;
     }
 
-    private void SetParameters(TDecorated decorated, ISpanNamingSchema? spanNamingSchema, bool decorateAllMethods)
+    private void SetParameters(TDecorated decorated, IActivityNamingSchema? spanNamingSchema, bool decorateAllMethods)
     {
         _decorated = decorated;
         _activity = new(_decorated!.GetType().FullName!);
@@ -58,7 +58,7 @@ public class TraceDecorator<TDecorated> : DispatchProxy where TDecorated : class
             throw;
         }
     }
-
+    
     
     protected override object? Invoke(MethodInfo? targetMethod, object?[]? args)
     {
@@ -69,6 +69,9 @@ public class TraceDecorator<TDecorated> : DispatchProxy where TDecorated : class
         {
             var defaultSpanName = _namingSchema.GetSpanName(_decorated!.GetType(), targetMethod);
             using var activity = _activity.StartActivity(activityAttribute?.Name ?? defaultSpanName);
+         
+            InjectAttributes(targetMethod, activity);
+
             if (activityAttribute?.RecordExceptions==false)
             {
                 return InvokeDecoratedExecution(targetMethod, args);
@@ -81,6 +84,27 @@ public class TraceDecorator<TDecorated> : DispatchProxy where TDecorated : class
         return InvokeDecoratedExecution(targetMethod, args);
 
     }
-    
 
+    private void InjectAttributes(MethodInfo targetMethod, Activity? activity)
+    {
+        var methodActivityAttributes = targetMethod.GetCustomAttribute<ActivitiesAttributesAttribute>(inherit: false);
+        var classActivityAttributes =
+            _decorated.GetType().GetCustomAttribute<ActivitiesAttributesAttribute>(inherit: false);
+
+        if (methodActivityAttributes != null)
+        {
+            foreach (var key in classActivityAttributes.Attributes.Keys)
+            {
+                activity.AddTag(key, methodActivityAttributes.Attributes[key]);
+            }
+        }
+
+        if (classActivityAttributes != null)
+        {
+            foreach (var key in classActivityAttributes.Attributes.Keys)
+            {
+                activity.AddTag(key, methodActivityAttributes.Attributes[key]);
+            }
+        }
+    }
 }

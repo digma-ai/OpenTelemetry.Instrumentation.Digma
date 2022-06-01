@@ -2,12 +2,12 @@ using System.Reflection;
 
 namespace OpenTelemetry.Instrumentation.Digma.Helpers;
 
-public interface ISpanNamingSchema
+public interface IActivityNamingSchema
 {
     public string GetSpanName(Type classType, MethodInfo method);
 }
 
-public class MethodFullNameSchema : ISpanNamingSchema
+public class MethodFullNameSchema : IActivityNamingSchema
 {
     public string GetSpanName(Type classType, MethodInfo method)
     {
@@ -15,7 +15,7 @@ public class MethodFullNameSchema : ISpanNamingSchema
     }
 }
 
-public class ClassAndMethodNameSchema : ISpanNamingSchema
+public class ClassAndMethodNameSchema : IActivityNamingSchema
 {
     public string GetSpanName(Type classType, MethodInfo method)
     {
