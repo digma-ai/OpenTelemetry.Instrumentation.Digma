@@ -60,7 +60,15 @@ public static class DigmaInstrumentationHelperExtensions
 
         if (options.Environment == null)
         {
-            options.Environment = Environment.GetEnvironmentVariable(options.EnvironmentEnvVariable) ?? "UNSET_ENV";
+            var env = Environment.GetEnvironmentVariable(options.EnvironmentEnvVariable);
+            if (env is null)
+            {
+                options.Environment = Environment.MachineName + "[local]";
+            }
+            else
+            {
+                options.Environment = env;
+            }
         }
 
         builder.AddAttributes(new[]

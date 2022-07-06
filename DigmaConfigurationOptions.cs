@@ -18,7 +18,7 @@ namespace OpenTelemetry.Instrumentation.Digma
     public class DigmaConfigurationOptions
     {
         private const string DEFAULT_COMMIT_ENV_VAR="DEPLOYMENT_COMMIT_ID";
-        private const string DEFAULT_ENV_ENV_VAR="DEPLOYMENT_ENVIORNMENT";
+        private const string DEFAULT_ENV_ENV_VAR="DEPLOYMENT_ENV";
 
         public string? NamespaceRoot { get; set; } = null;
         public string? Environment { get; set; } = null;
