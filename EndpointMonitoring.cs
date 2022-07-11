@@ -103,8 +103,6 @@ public static class EndpointMonitoring
 
             Activity.Current?.AddTag("code.namespace", descriptor.MethodInfo.DeclaringType?.ToString());
             Activity.Current?.AddTag("code.function", descriptor.MethodInfo.Name);
-            Activity.Current?.AddTag("endpoint.type_full_name", descriptor.MethodInfo.DeclaringType?.ToString());// should be deleted
-            Activity.Current?.AddTag("endpoint.function", descriptor.MethodInfo.Name); //should be deleted
             Activity.Current?.AddTag("code.function.parameter.types", BuildParameterTypes(descriptor.MethodInfo));
         }
     }
