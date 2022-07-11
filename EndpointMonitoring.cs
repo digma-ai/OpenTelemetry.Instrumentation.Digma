@@ -1,8 +1,7 @@
-﻿using System.Collections.Concurrent;
-using System.Diagnostics;
+﻿using System.Diagnostics;
+using System.Reflection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -96,16 +95,28 @@ public static class EndpointMonitoring
             if (pair.Key != "Microsoft.AspNetCore.Routing.EndpointMatched")
                 return;
 
-            var context = (HttpContext) pair.Value;
+            var context = (HttpContext)pair.Value;
             var endpoint = context?.GetEndpoint();
             var descriptor = endpoint?.Metadata.GetMetadata<ControllerActionDescriptor>();
             if (descriptor == null)
                 return;
-            
+
             Activity.Current?.AddTag("code.namespace", descriptor.MethodInfo.DeclaringType?.ToString());
             Activity.Current?.AddTag("code.function", descriptor.MethodInfo.Name);
             Activity.Current?.AddTag("endpoint.type_full_name", descriptor.MethodInfo.DeclaringType?.ToString());// should be deleted
             Activity.Current?.AddTag("endpoint.function", descriptor.MethodInfo.Name); //should be deleted
+            Activity.Current?.AddTag("code.function.parameter.types", BuildParameterTypes(descriptor.MethodInfo));
         }
+    }
+
+    static string BuildParameterTypes(MethodInfo methodInfo)
+    {
+        var paramInfos = methodInfo.GetParameters();
+        if (paramInfos == null || paramInfos.Length <= 0)
+        {
+            return "";
+        }
+
+        return string.Join('|', paramInfos.Select(pi => pi.ParameterType.FullName));
     }
 }
