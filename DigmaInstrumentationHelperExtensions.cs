@@ -14,21 +14,20 @@
 // limitations under the License.
 // </copyright>
 
+using System.Diagnostics;
 using System.Reflection;
+using OpenTelemetry.Resources;
 
 namespace OpenTelemetry.Instrumentation.Digma;
 
-using System.Diagnostics;
-using OpenTelemetry.Resources;
-
 public static class DigmaInstrumentationHelperExtensions
 {
-    private static readonly HashSet<string> IgnoreNamespaces = new() {"Microsoft", "System"};
+    private static readonly HashSet<string> IgnoreNamespaces = new() { "Microsoft", "System" };
 
     public static ResourceBuilder AddDigmaAttributes(this ResourceBuilder builder,
-                                                     Action<DigmaConfigurationOptions> configure = null)
+        Action<DigmaConfigurationOptions>? configure = null)
     {
-        var workingDirectory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+        var workingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
         DigmaConfigurationOptions options = new DigmaConfigurationOptions();
         if (configure != null)
@@ -61,7 +60,7 @@ public static class DigmaInstrumentationHelperExtensions
         if (options.Environment == null)
         {
             var env = Environment.GetEnvironmentVariable(options.EnvironmentEnvVariable);
-            if (env is null)
+            if (string.IsNullOrWhiteSpace(env))
             {
                 options.Environment = Environment.MachineName + "[local]";
             }

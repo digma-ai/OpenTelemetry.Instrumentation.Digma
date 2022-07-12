@@ -7,6 +7,7 @@ namespace OpenTelemetry.Instrumentation.Digma.Helpers.Attributes;
 public class ActivitiesAttributesAttribute : Attribute
 {
     public IDictionary<string, string> Attributes { get; }
+
     /// <summary>
     /// Define a set of attributes that will be included with every Activity
     /// created by the TracingDecorator for this object
@@ -18,8 +19,7 @@ public class ActivitiesAttributesAttribute : Attribute
     /// <param name="extraAttributes">A set of attributes defined as "key:value"</param>
     public ActivitiesAttributesAttribute(params string[] extraAttributes)
     {
-        Attributes =TraceAttributesInputsFormat.ActivityAttributesStringsToDictionary(extraAttributes);
-
+        Attributes = TraceAttributesInputsFormat.ActivityAttributesStringsToDictionary(extraAttributes);
     }
 }
 
@@ -31,15 +31,15 @@ internal static class TraceAttributesInputsFormat
         {
             return new Dictionary<string, string>();
         }
+
         var attributeFragements = attributes
             .Select(x => x.Split(":")).ToArray();
-        
+
         EnsureAttributeSyntax(attributes, attributeFragements);
 
         EnsureUniqueKeys(attributes, attributeFragements);
 
         return attributeFragements.ToDictionary(x => x[0], x => x[1]);
-        
     }
 
     private static void EnsureUniqueKeys(string[] attributes, string[][] attributeFragements)

@@ -13,12 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // </copyright>
+
 namespace OpenTelemetry.Instrumentation.Digma
 {
     public class DigmaConfigurationOptions
     {
-        private const string DEFAULT_COMMIT_ENV_VAR="DEPLOYMENT_COMMIT_ID";
-        private const string DEFAULT_ENV_ENV_VAR="DEPLOYMENT_ENV";
+        private const string DEFAULT_COMMIT_ENV_VAR = "DEPLOYMENT_COMMIT_ID";
+        private const string DEFAULT_ENV_ENV_VAR = "DEPLOYMENT_ENV";
 
         public string? NamespaceRoot { get; set; } = null;
         public string? Environment { get; set; } = null;
