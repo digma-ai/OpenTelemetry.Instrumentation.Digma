@@ -3,19 +3,19 @@ using System.Reflection;
 
 namespace OpenTelemetry.Instrumentation.Digma;
 
-public class SpanUtils
+public static class SpanUtils
 {
     public static void AddCommonTags(MethodInfo methodInfo, Activity? activity)
     {
-        activity.AddTag("code.namespace", methodInfo.DeclaringType?.ToString());
-        activity.AddTag("code.function", methodInfo.Name);
-        activity.AddTag("code.function.parameter.types", BuildParameterTypes(methodInfo));
+        activity?.AddTag("code.namespace", methodInfo.DeclaringType?.ToString());
+        activity?.AddTag("code.function", methodInfo.Name);
+        activity?.AddTag("code.function.parameter.types", BuildParameterTypes(methodInfo));
     }
 
     static string BuildParameterTypes(MethodInfo methodInfo)
     {
-        var paramInfos = methodInfo.GetParameters();
-        if (paramInfos == null || paramInfos.Length <= 0)
+        ParameterInfo[] paramInfos = methodInfo.GetParameters();
+        if (paramInfos.Length <= 0)
         {
             return "";
         }
