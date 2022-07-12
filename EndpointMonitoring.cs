@@ -101,20 +101,7 @@ public static class EndpointMonitoring
             if (descriptor == null)
                 return;
 
-            Activity.Current?.AddTag("code.namespace", descriptor.MethodInfo.DeclaringType?.ToString());
-            Activity.Current?.AddTag("code.function", descriptor.MethodInfo.Name);
-            Activity.Current?.AddTag("code.function.parameter.types", BuildParameterTypes(descriptor.MethodInfo));
+            SpanUtils.AddCommonTags(descriptor.MethodInfo, Activity.Current);
         }
-    }
-
-    static string BuildParameterTypes(MethodInfo methodInfo)
-    {
-        var paramInfos = methodInfo.GetParameters();
-        if (paramInfos == null || paramInfos.Length <= 0)
-        {
-            return "";
-        }
-
-        return string.Join('|', paramInfos.Select(pi => pi.ParameterType.FullName));
     }
 }
