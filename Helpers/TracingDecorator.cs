@@ -70,6 +70,7 @@ public class TraceDecorator<TDecorated> : DispatchProxy where TDecorated : class
             var defaultSpanName = _namingSchema.GetSpanName(_decorated!.GetType(), targetMethod);
             using var activity = _activity.StartActivity(activityAttribute?.Name ?? defaultSpanName);
          
+            SpanUtils.AddCommonTags(targetMethod, activity);
             InjectAttributes(targetMethod, activity);
 
             if (activityAttribute?.RecordExceptions==false)
