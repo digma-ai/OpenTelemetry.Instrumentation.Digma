@@ -12,7 +12,7 @@ public class TestTracingDecorator
 {
     private static readonly string ServiceInterfaceFqn =
         "OpenTelemetry.Instrumentation.Digma.Tests.Stubs.IDecoratedService";
-    
+
     [TestMethod]
     public void Activity_Created_For_Attribute_Marked_Method()
     {
@@ -26,7 +26,6 @@ public class TestTracingDecorator
         });
     }
 
-    
     [TestInitialize]
     public void SetupOtel()
     {
@@ -55,21 +54,21 @@ public class TestTracingDecorator
     public void Activity_Not_Created_For_Non_Attribute_Marked_Method_If_All_Methods_False()
     {
         DecoratedService service = new DecoratedService();
-        IDecoratedService tracingDecorator = TraceDecorator<IDecoratedService>.Create(service, decorateAllMethods:false);
-        tracingDecorator.MethodNotExplicitlyMarkedForTracing(() =>
-        {
-            Assert.IsNull(Activity.Current);
-        });
+        IDecoratedService tracingDecorator =
+            TraceDecorator<IDecoratedService>.Create(service, decorateAllMethods: false);
+        tracingDecorator.MethodNotExplicitlyMarkedForTracing(() => { Assert.IsNull(Activity.Current); });
     }
 
-    private void AssertHasCommonTags(Activity? activity, string expectedClassName, string expectedMethodName, string expectedParameterTypes)
+    private void AssertHasCommonTags(Activity? activity,
+        string expectedClassName, string expectedMethodName, string expectedParameterTypes)
     {
         var kvpTags = activity.Tags.ToArray();
         CollectionAssert.Contains(kvpTags, new KeyValuePair<string, string>("code.namespace", expectedClassName));
         CollectionAssert.Contains(kvpTags, new KeyValuePair<string, string>("code.function", expectedMethodName));
         if (!string.IsNullOrWhiteSpace(expectedParameterTypes))
         {
-            CollectionAssert.Contains(kvpTags, new KeyValuePair<string, string>("code.function.parameter.types", expectedParameterTypes));
+            CollectionAssert.Contains(kvpTags,
+                new KeyValuePair<string, string>("code.function.parameter.types", expectedParameterTypes));
         }
     }
 }

@@ -7,7 +7,6 @@ namespace OpenTelemetry.Instrumentation.Digma.Helpers;
 
 public class TraceDecorator<TDecorated> : DispatchProxy where TDecorated : class
 {
-    
     private ActivitySource _activity;
     private TDecorated _decorated;
     private IActivityNamingSchema _namingSchema = new MethodFullNameSchema();
@@ -20,11 +19,11 @@ public class TraceDecorator<TDecorated> : DispatchProxy where TDecorated : class
     /// <param name="activityNamingSchema"></param>
     /// <param name="decorateAllMethods"></param>
     /// <returns></returns>
-    public static TDecorated Create(TDecorated decorated, IActivityNamingSchema? activityNamingSchema=null, 
-                                    bool decorateAllMethods=true)
+    public static TDecorated Create(TDecorated decorated, IActivityNamingSchema? activityNamingSchema = null,
+        bool decorateAllMethods = true)
     {
         object proxy = Create<TDecorated, TraceDecorator<TDecorated>>()!;
-        ((TraceDecorator<TDecorated>)proxy!).SetParameters(decorated, activityNamingSchema,decorateAllMethods);
+        ((TraceDecorator<TDecorated>)proxy!).SetParameters(decorated, activityNamingSchema, decorateAllMethods);
 
         return (TDecorated)proxy;
     }
@@ -39,6 +38,7 @@ public class TraceDecorator<TDecorated> : DispatchProxy where TDecorated : class
             _namingSchema = spanNamingSchema;
         }
     }
+
     private object? InvokeDecoratedExecution(MethodInfo? targetMethod, object?[]? args)
     {
         var result = targetMethod.Invoke(_decorated, args);
@@ -58,32 +58,29 @@ public class TraceDecorator<TDecorated> : DispatchProxy where TDecorated : class
             throw;
         }
     }
-    
-    
+
     protected override object? Invoke(MethodInfo? targetMethod, object?[]? args)
     {
         var noActivityAttribute = targetMethod.GetCustomAttribute<NoActivityAttribute>(false);
         var activityAttribute = targetMethod.GetCustomAttribute<TraceActivityAttribute>(false);
 
-        if (noActivityAttribute == null && (_decorateAllMethods || activityAttribute!=null))
+        if (noActivityAttribute == null && (_decorateAllMethods || activityAttribute != null))
         {
             var defaultSpanName = _namingSchema.GetSpanName(_decorated!.GetType(), targetMethod);
             using var activity = _activity.StartActivity(activityAttribute?.Name ?? defaultSpanName);
-         
+
             SpanUtils.AddCommonTags(targetMethod, activity);
             InjectAttributes(targetMethod, activity);
 
-            if (activityAttribute?.RecordExceptions==false)
+            if (activityAttribute?.RecordExceptions == false)
             {
                 return InvokeDecoratedExecution(targetMethod, args);
             }
-          
+
             return WrapWithRecordException(activity, () => InvokeDecoratedExecution(targetMethod, args));
-
         }
-       
-        return InvokeDecoratedExecution(targetMethod, args);
 
+        return InvokeDecoratedExecution(targetMethod, args);
     }
 
     private void InjectAttributes(MethodInfo targetMethod, Activity? activity)
