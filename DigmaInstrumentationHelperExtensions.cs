@@ -25,7 +25,7 @@ public static class DigmaInstrumentationHelperExtensions
     private static readonly HashSet<string> IgnoreNamespaces = new() { "Microsoft", "System" };
 
     public static ResourceBuilder AddDigmaAttributes(this ResourceBuilder builder,
-        Action<DigmaConfigurationOptions> configure = null)
+        Action<DigmaConfigurationOptions>? configure = null)
     {
         var workingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
