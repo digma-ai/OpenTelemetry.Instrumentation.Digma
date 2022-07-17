@@ -1,10 +1,7 @@
-﻿using System.Collections.Concurrent;
-using System.Diagnostics;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Controllers;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
+﻿using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using OpenTelemetry.Instrumentation.Digma.Diagnostic;
 
 namespace OpenTelemetry.Instrumentation.Digma;
 
@@ -20,9 +17,9 @@ public static class EndpointMonitoring
     {
         private readonly DiagnosticSubscriber _observer;
 
-        public DiagnosticInit()
+        public DiagnosticInit(IEnumerable<IDigmaDiagnosticObserver> diagnosticObserver)
         {
-            _observer = new DiagnosticSubscriber();
+            _observer = new DiagnosticSubscriber(diagnosticObserver);
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -38,12 +35,14 @@ public static class EndpointMonitoring
         }
     }
 
+    
     private class DiagnosticSubscriber : IObserver<DiagnosticListener>, IDisposable
     {
+        private readonly IEnumerable<IDigmaDiagnosticObserver> _diagnosticObservers;
         private readonly List<IDisposable> _subscriptions;
-
-        public DiagnosticSubscriber()
+        public DiagnosticSubscriber(IEnumerable<IDigmaDiagnosticObserver> diagnosticObservers)
         {
+            _diagnosticObservers = diagnosticObservers;
             _subscriptions = new List<IDisposable>();
         }
 
@@ -63,10 +62,9 @@ public static class EndpointMonitoring
 
         public void OnNext(DiagnosticListener value)
         {
-            if (value.Name != "Microsoft.AspNetCore")
-                return;
-
-            var subscription = value.Subscribe(new DiagnosticObserver());
+            var diagnosticObserver = _diagnosticObservers.FirstOrDefault(o => o.CanHandle(value.Name));
+            if(diagnosticObserver is null) return;
+            var subscription = value.Subscribe(diagnosticObserver);
             _subscriptions.Add(subscription);
         }
 
@@ -80,32 +78,6 @@ public static class EndpointMonitoring
             _subscriptions.Clear();
         }
     }
-
-    private class DiagnosticObserver : IObserver<KeyValuePair<string, object?>>
-    {
-        public void OnCompleted()
-        {
-        }
-
-        public void OnError(Exception error)
-        {
-        }
-
-        public void OnNext(KeyValuePair<string, object?> pair)
-        {
-            if (pair.Key != "Microsoft.AspNetCore.Routing.EndpointMatched")
-                return;
-
-            var context = (HttpContext) pair.Value;
-            var endpoint = context?.GetEndpoint();
-            var descriptor = endpoint?.Metadata.GetMetadata<ControllerActionDescriptor>();
-            if (descriptor == null)
-                return;
-            
-            Activity.Current?.AddTag("code.namespace", descriptor.MethodInfo.DeclaringType?.ToString());
-            Activity.Current?.AddTag("code.function", descriptor.MethodInfo.Name);
-            Activity.Current?.AddTag("endpoint.type_full_name", descriptor.MethodInfo.DeclaringType?.ToString());// should be deleted
-            Activity.Current?.AddTag("endpoint.function", descriptor.MethodInfo.Name); //should be deleted
-        }
-    }
 }
+
+    
