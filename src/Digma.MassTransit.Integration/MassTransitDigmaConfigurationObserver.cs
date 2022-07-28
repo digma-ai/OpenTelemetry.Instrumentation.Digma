@@ -11,12 +11,11 @@ public static class MassTransitDiagnosticObserverExtensions
 {
     public static IServiceCollection UseDigmaMassTransitDiagnosticObserver(this IServiceCollection serviceCollection, Action<MassTransitDigmaConfigurationObserver> action)
     {
-        
         var config = new MassTransitDigmaConfigurationObserver();
         action(config);
         serviceCollection.AddSingleton<IMassTransitDigmaConfigurationObserver>(config);
         serviceCollection.AddTransient<IDigmaDiagnosticObserver, MasstransitDiagnosticObserver>();
-        serviceCollection.AddEndpointMonitoring();
+        serviceCollection.AddHostedService<DiagnosticInit>();
         return serviceCollection;
     }
 }

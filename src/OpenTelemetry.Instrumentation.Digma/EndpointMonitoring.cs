@@ -1,40 +1,30 @@
 ﻿using System.Diagnostics;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenTelemetry.Instrumentation.Digma.Diagnostic;
 
 namespace OpenTelemetry.Instrumentation.Digma;
 
-public static class EndpointMonitoring
+public class DiagnosticInit : IHostedService
 {
-    public static IServiceCollection AddEndpointMonitoring(this IServiceCollection services)
+    private readonly DiagnosticSubscriber _observer;
+
+    public DiagnosticInit(IEnumerable<IDigmaDiagnosticObserver> diagnosticObserver)
     {
-        services.AddHostedService<DiagnosticInit>();
-        return services;
+        _observer = new DiagnosticSubscriber(diagnosticObserver);
     }
 
-    private class DiagnosticInit : IHostedService
+    public Task StartAsync(CancellationToken cancellationToken)
     {
-        private readonly DiagnosticSubscriber _observer;
-
-        public DiagnosticInit(IEnumerable<IDigmaDiagnosticObserver> diagnosticObserver)
-        {
-            _observer = new DiagnosticSubscriber(diagnosticObserver);
-        }
-
-        public Task StartAsync(CancellationToken cancellationToken)
-        {
-            _observer.Subscribe();
-            return Task.CompletedTask;
-        }
-
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            _observer.Dispose();
-            return Task.CompletedTask;
-        }
+        _observer.Subscribe();
+        return Task.CompletedTask;
     }
 
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        _observer.Dispose();
+        return Task.CompletedTask;
+    }
+    
     
     private class DiagnosticSubscriber : IObserver<DiagnosticListener>, IDisposable
     {
@@ -79,3 +69,6 @@ public static class EndpointMonitoring
         }
     }
 }
+
+
+

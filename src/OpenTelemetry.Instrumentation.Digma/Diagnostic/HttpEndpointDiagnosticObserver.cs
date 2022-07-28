@@ -10,7 +10,7 @@ public static class HttpDiagnosticObserverExtensions
     public static IServiceCollection UseDigmaHttpDiagnosticObserver(this IServiceCollection serviceCollection)
     {
         serviceCollection.AddTransient<IDigmaDiagnosticObserver, HttpEndpointDiagnosticObserver>();
-        serviceCollection.AddEndpointMonitoring();
+        serviceCollection.AddHostedService<DiagnosticInit>();
         return serviceCollection;
     }
 }
