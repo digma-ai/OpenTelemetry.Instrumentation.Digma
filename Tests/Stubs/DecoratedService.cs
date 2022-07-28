@@ -14,6 +14,11 @@ public interface IDecoratedService
     public void MethodWithStrangeParams1(Action stateValidation,
         IList<string>[] arrayOfList, ISet<int[]> setOfArray, IDictionary<int, ICollection<string>> dict,
         ref int intVal);
+
+    public void MethodJaggedAndMultiDimArraysParams(Action stateValidation, out string strVal,
+        bool[][][] jaggedArrayOfBools, short[,,,][,][,,] multiDimArrayOfShorts,
+        long[,,][][,][] mixMultiDimAndJaggedArraysOfLongs
+    );
 }
 
 public class DecoratedService : IDecoratedService
@@ -39,6 +44,14 @@ public class DecoratedService : IDecoratedService
     public void MethodWithStrangeParams1(Action stateValidation,
         IList<string>[] arrayOfList, ISet<int[]> setOfArray, IDictionary<int, ICollection<string>> dict, ref int intVal)
     {
+        stateValidation();
+    }
+
+    public void MethodJaggedAndMultiDimArraysParams(Action stateValidation, out string strVal,
+        bool[][][] jaggedArrayOfBools, short[,,,][,][,,] multiDimArrayOfShorts,
+        long[,,][][,][] mixMultiDimAndJaggedArraysOfLongs)
+    {
+        strVal = "hello";
         stateValidation();
     }
 }

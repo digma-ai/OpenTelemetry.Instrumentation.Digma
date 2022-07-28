@@ -67,6 +67,22 @@ public class TestTracingDecorator
     }
 
     [TestMethod]
+    public void Activity_Created_MethodJaggedAndMultiDimArraysParams()
+    {
+        DecoratedService service = new DecoratedService();
+        IDecoratedService tracingDecorator = TraceDecorator<IDecoratedService>.Create(service);
+        string strVal;
+        tracingDecorator.MethodJaggedAndMultiDimArraysParams(() =>
+            {
+                Assert.IsNotNull(Activity.Current);
+                AssertHasCommonTags(Activity.Current, ServiceInterfaceFqn, "MethodJaggedAndMultiDimArraysParams",
+                    "Action|String&|Boolean[][][]|Int16[,,][,][,,,]|Int64[][,][][,,]");
+            },
+            out strVal, new bool[][][] { }, new short[,,,][,][,,] { }, new long[,,][][,][] { }
+        );
+    }
+
+    [TestMethod]
     public void Activity_Not_Created_For_Non_Attribute_Marked_Method_If_All_Methods_False()
     {
         DecoratedService service = new DecoratedService();
