@@ -44,7 +44,7 @@ jobs:
         id: package_version
         uses: KageKirin/set-csproj-version@v0
         with:
-          file: src/${{env.PROJECT}}.csproj
+          file: src/${{env.PROJECT}}/${{env.PROJECT}}.csproj
           version: ${{ steps.tag.outputs.tag }}
 
       - name: dotnet pack ${{env.PROJECT}}
