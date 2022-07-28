@@ -3,6 +3,12 @@
         <TargetFramework>net6.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <IsPackable>true</IsPackable>
+        <PackageId>Digma.MassTransit.Integration</PackageId>
+        <Version>0.0.0</Version>
+        <Authors>Digma Team</Authors>
+        <Company>Digma</Company>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     </PropertyGroup>
     <ItemGroup>
       <ProjectReference Include="..\OpenTelemetry.Instrumentation.Digma\OpenTelemetry.Instrumentation.Digma.csproj" />
