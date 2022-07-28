@@ -15,7 +15,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="LICENSE" Pack="true" PackagePath="LICENSE" />
     <PackageReference Include="MSTest" Version="2.2.10" />
     <PackageReference Include="OpenTelemetry" Version="1.3.0" />
     <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.0.0-rc9.4" />

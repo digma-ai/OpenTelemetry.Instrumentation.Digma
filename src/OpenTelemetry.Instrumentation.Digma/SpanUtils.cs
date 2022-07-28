@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
-using OpenTelemetry.Trace;
 
 namespace OpenTelemetry.Instrumentation.Digma;
 
@@ -21,6 +20,6 @@ public static class SpanUtils
             return "";
         }
 
-        return string.Join('|', paramInfos.Select(pi => pi.ParameterType.FullName));
+        return string.Join('|', paramInfos.Select(pi => pi.ParameterType.Name));
     }
 }
