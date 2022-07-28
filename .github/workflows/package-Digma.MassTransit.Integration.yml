@@ -20,6 +20,13 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      - name: Get tag
+        id: tag
+        uses: dawidd6/action-get-tag@v1
+        with:
+          # Optionally strip `v` prefix
+          strip_v: true
+        
       - name: Get version 
         uses: bhowell2/github-substring-action@v1.0.0
         id: version
@@ -28,13 +35,6 @@ jobs:
           index_of_str: "MassTransit.Integration-MT7-"
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
-
-      - name: Get tag
-        id: tag
-        uses: dawidd6/action-get-tag@v1
-        with:
-          # Optionally strip `v` prefix
-          strip_v: true
             
       - name: Install dependencies
         run: dotnet restore
