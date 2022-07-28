@@ -20,6 +20,6 @@ public static class SpanUtils
             return "";
         }
 
-        return string.Join('|', paramInfos.Select(pi => pi.ParameterType.FullName));
+        return string.Join('|', paramInfos.Select(pi => pi.ParameterType.Name));
     }
 }
