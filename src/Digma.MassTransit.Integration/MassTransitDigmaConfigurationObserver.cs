@@ -1,8 +1,10 @@
 using System.Reflection;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
+using OpenTelemetry.Instrumentation.Digma;
+using OpenTelemetry.Instrumentation.Digma.Diagnostic;
 
-namespace OpenTelemetry.Instrumentation.Digma.Diagnostic;
+namespace Digma.MassTransit.Integration;
 
 
 public static class MassTransitDiagnosticObserverExtensions
@@ -54,7 +56,7 @@ public class MassTransitDigmaConfigurationObserver: IMassTransitDigmaConfigurati
     {
         if (!messageType.IsGenericType) return messageType;
         var genericTypeDefinition = messageType.GetGenericTypeDefinition();
-        if (genericTypeDefinition != typeof(MassTransit.Batch<>)) return messageType;
+        if (genericTypeDefinition != typeof(global::MassTransit.Batch<>)) return messageType;
         var arguments = messageType.GetGenericArguments();
         messageType = arguments.Single();
         return messageType;

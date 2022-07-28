@@ -1,7 +1,9 @@
 using System.Collections.Concurrent;
 using System.Reflection;
+using OpenTelemetry.Instrumentation.Digma;
+using OpenTelemetry.Instrumentation.Digma.Diagnostic;
 
-namespace OpenTelemetry.Instrumentation.Digma.Diagnostic;
+namespace Digma.MassTransit.Integration;
 
 public class MasstransitDiagnosticObserver : IDigmaDiagnosticObserver
 {
@@ -42,9 +44,7 @@ public class MasstransitDiagnosticObserver : IDigmaDiagnosticObserver
         });
         if (methodInfo is null) return;
         
-        
         //Parent span is of kind consumer
-        System.Diagnostics.Activity.Current?.Parent?.AddTag("code.namespace", methodInfo.DeclaringType?.ToString());
-        System.Diagnostics.Activity.Current?.Parent?.AddTag("code.function", methodInfo.Name);
+        SpanUtils.AddCommonTags(methodInfo,System.Diagnostics.Activity.Current?.Parent);
     }
 }

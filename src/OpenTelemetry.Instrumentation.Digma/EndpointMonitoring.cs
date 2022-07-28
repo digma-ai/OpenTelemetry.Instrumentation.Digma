@@ -79,5 +79,3 @@ public static class EndpointMonitoring
         }
     }
 }
-
-    
