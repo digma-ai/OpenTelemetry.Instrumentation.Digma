@@ -7,7 +7,7 @@ on:
   # Triggers the workflow on push or pull request events but only for the main branch
   push:
     tags:
-      - 'MassTransit.Integration-*' # trigger when we create a tag with prefix "MassTransit.Integration-"
+      - 'MassTransit.Integration-MT7-*' # trigger when we create a tag with prefix "MassTransit.Integration-"
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -20,6 +20,11 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      - uses: bhowell2/github-substring-action
+        id: version
+        with:
+          value: ${{ steps.tag.outputs.tag }}
+          index_of_str: "MassTransit.Integration-MT7-"
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
@@ -40,12 +45,12 @@ jobs:
         run: dotnet test src/${{env.PROJECT}}
         
       
-#      - name: update version in csproj
-#        id: package_version
-#        uses: KageKirin/set-csproj-version@v0
-#        with:
-#          file: src/${{env.PROJECT}}/${{env.PROJECT}}.csproj
-#          version: ${{ steps.tag.outputs.tag }}
+      - name: update version in csproj
+        id: package_version
+        uses: KageKirin/set-csproj-version@v0
+        with:
+          file: src/${{env.PROJECT}}/${{env.PROJECT}}.csproj
+          version: ${{ steps.version.outputs.substring }}
 
       - name: dotnet pack ${{env.PROJECT}}
         run: dotnet pack src/${{env.PROJECT}} -c Release --no-build
