@@ -10,6 +10,10 @@ public interface IDecoratedService
     public Task AsyncMethodExplicitlyMarkedForTracing(Action stateValidation);
 
     public void MethodNotExplicitlyMarkedForTracing(Action stateValidation);
+
+    public void MethodWithStrangeParams1(Action stateValidation,
+        IList<string>[] arrayOfList, ISet<int[]> setOfArray, IDictionary<int, ICollection<string>> dict,
+        ref int intVal);
 }
 
 public class DecoratedService : IDecoratedService
@@ -28,6 +32,12 @@ public class DecoratedService : IDecoratedService
     }
 
     public void MethodNotExplicitlyMarkedForTracing(Action stateValidation)
+    {
+        stateValidation();
+    }
+
+    public void MethodWithStrangeParams1(Action stateValidation,
+        IList<string>[] arrayOfList, ISet<int[]> setOfArray, IDictionary<int, ICollection<string>> dict, ref int intVal)
     {
         stateValidation();
     }

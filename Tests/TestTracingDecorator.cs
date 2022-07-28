@@ -22,7 +22,7 @@ public class TestTracingDecorator
         {
             Assert.IsNotNull(Activity.Current);
             AssertHasCommonTags(Activity.Current, ServiceInterfaceFqn,
-                "MethodExplicitlyMarkedForTracing", "System.Action");
+                "MethodExplicitlyMarkedForTracing", "Action");
         });
     }
 
@@ -46,8 +46,24 @@ public class TestTracingDecorator
         {
             Assert.IsNotNull(Activity.Current);
             AssertHasCommonTags(Activity.Current, ServiceInterfaceFqn,
-                "AsyncMethodExplicitlyMarkedForTracing", "System.Action");
+                "AsyncMethodExplicitlyMarkedForTracing", "Action");
         });
+    }
+
+    [TestMethod]
+    public void Activity_Created_MethodWithStrangeParams1()
+    {
+        DecoratedService service = new DecoratedService();
+        IDecoratedService tracingDecorator = TraceDecorator<IDecoratedService>.Create(service);
+        int intVal = 5;
+        tracingDecorator.MethodWithStrangeParams1(() =>
+            {
+                Assert.IsNotNull(Activity.Current);
+                AssertHasCommonTags(Activity.Current, ServiceInterfaceFqn, "MethodWithStrangeParams1",
+                    "Action|IList`1[]|ISet`1|IDictionary`2|Int32&");
+            },
+            new List<string>[] { }, new HashSet<int[]>(), new Dictionary<int, ICollection<string>>(), ref intVal
+        );
     }
 
     [TestMethod]
