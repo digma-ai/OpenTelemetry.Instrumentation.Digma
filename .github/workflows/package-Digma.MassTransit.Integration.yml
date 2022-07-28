@@ -21,7 +21,7 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - name: Get version 
-        uses: bhowell2/github-substring-action
+        uses: bhowell2/github-substring-action@v1.0.0
         id: version
         with:
           value: ${{ steps.tag.outputs.tag }}
