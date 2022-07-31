@@ -65,8 +65,8 @@ jobs:
 #      - name: Publish
 #        run: dotnet nuget push **/${{env.PROJECT}}/bin/**/*.nupkg -k ${{ secrets.NUGET_PAT }} -s https://api.nuget.org/v3/index.json
 
-      - name: Branch name
-        run: echo running on branch ${{ github.head_ref }}
+      - name: Ubuntu GitHub Actions environment variables List
+        run: env
           
           
 #      - name: commit new version file
