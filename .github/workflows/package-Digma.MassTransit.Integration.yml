@@ -65,15 +65,3 @@ jobs:
 #      - name: Publish
 #        run: dotnet nuget push **/${{env.PROJECT}}/bin/**/*.nupkg -k ${{ secrets.NUGET_PAT }} -s https://api.nuget.org/v3/index.json
 
-#      - name: Ubuntu GitHub Actions environment variables List
-#        run: env
-#          
-#          
-      - name: commit new version file
-        uses: stefanzweifel/git-auto-commit-action@v4.14.0
-        with:
-          # Commit message
-          commit_message: "bump version"
-          # Commit options (eg. --no-verify)
-          # branch: ${{ steps.extract_branch.outputs.branch }}
-  
