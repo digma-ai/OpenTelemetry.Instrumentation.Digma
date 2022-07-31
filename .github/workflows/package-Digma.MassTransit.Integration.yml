@@ -66,7 +66,7 @@ jobs:
 #        run: dotnet nuget push **/${{env.PROJECT}}/bin/**/*.nupkg -k ${{ secrets.NUGET_PAT }} -s https://api.nuget.org/v3/index.json
 
       - name: Branch name
-        run: echo running on branch ${GITHUB_REF##*/}
+        run: echo running on branch ${{ github.head_ref }}
           
           
 #      - name: commit new version file
