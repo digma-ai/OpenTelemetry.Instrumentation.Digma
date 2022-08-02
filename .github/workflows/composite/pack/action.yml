@@ -5,6 +5,9 @@ inputs:
   project:
     description: "Project name"
     required: true
+  nugetapikey:
+    description: "nuget API key"
+    required: true
 
 runs:
   using: "composite"
@@ -45,7 +48,7 @@ runs:
         path: '**/${{inputs.project}}/bin/**/*.*nupkg'
       
     - name: Publish
-      run: dotnet nuget push **/${{inputs.project}}/bin/**/*.nupkg -k ${{ secrets.NUGET_PAT }} -s https://api.nuget.org/v3/index.json
+      run: dotnet nuget push **/${{inputs.project}}/bin/**/*.nupkg -k ${{ secrets.nugetapikey }} -s https://api.nuget.org/v3/index.json
 
     - name: commit new version file
       uses: stefanzweifel/git-auto-commit-action@v4.14.0

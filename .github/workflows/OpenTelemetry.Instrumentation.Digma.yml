@@ -16,4 +16,5 @@ jobs:
       - uses: ./.github/workflows/composite/pack
         with:
           project: ${{ env.PROJECT }}
+          nugetapikey: ${{ secrets.NUGET_PAT }}
   
