@@ -11,6 +11,8 @@ jobs:
     name: publish nuget
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
       - uses: ./.github/pack-action
         with:
           project: ${{ env.PROJECT }}
