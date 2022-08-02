@@ -10,5 +10,5 @@ A GitHub workflow need to be triggered tag  is pushed.
 
 ```
 git tag v0.0.0
-git push v0.0.0
+git push origin v0.0.0
 ```
