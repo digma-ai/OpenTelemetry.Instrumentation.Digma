@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - uses: .github/workflows/pack-action
+      - uses: ./.github/workflows/composite/pack
         with:
           project: ${{ env.PROJECT }}
   
