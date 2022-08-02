@@ -3,24 +3,12 @@
 
 # Release Guidelines
 
-### OpenTelemetry.Instrumentation.Digma:
+### nuget packages:
 
-To release OpenTelemetry.Instrumentation.Digma project as nuget, 
-A GitHub workflow need to be triggered when a tag with prefix
-"OpenTelemetry.Instrumentation.Digma-%Version%" is pushed. 
-
-```
-git tag OpenTelemetry.Instrumentation.Digma-%VERSION%
-git push origin OpenTelemetry.Instrumentation.Digma-%VERSION%
-```
-
-### Digma.MassTransit.Integration:
-
-To release Digma.MassTransit.Integration project as nuget,
-A GitHub workflow need to be triggered when a tag with prefix
-"Digma.MassTransit.Integration-%Version%" is pushed.
+To release projects as nuget, 
+A GitHub workflow need to be triggered tag  is pushed. 
 
 ```
-git tag Digma.MassTransit.Integration-%VERSION%
-git push origin Digma.MassTransit.Integration-%VERSION%
+git tag v0.0.0
+git push v0.0.0
 ```
