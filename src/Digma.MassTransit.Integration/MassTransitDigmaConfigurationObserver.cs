@@ -42,7 +42,7 @@ public class MassTransitDigmaConfigurationObserver: IMassTransitDigmaConfigurati
         return _consumeMethodMap.TryGetValue(messageType, out var mi) ? mi : null;
     }
     
-    public MassTransitDigmaConfigurationObserver Observe<TConsumer>()
+    public MassTransitDigmaConfigurationObserver Observe<TConsumer>() where TConsumer: IConsumer
     {
         var consumerType = typeof(TConsumer);
         var iInterfaceType = consumerType.GetInterface(typeof(IConsumer<>).Name);
