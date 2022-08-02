@@ -11,7 +11,7 @@ jobs:
     name: publish nuget
     runs-on: ubuntu-latest
     steps:
-      - uses: ./pack-action
+      - uses: ./.github/pack-action
         with:
           project: ${{ env.PROJECT }}
   
