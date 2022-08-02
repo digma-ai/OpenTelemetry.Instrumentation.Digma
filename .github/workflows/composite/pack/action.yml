@@ -23,12 +23,15 @@ runs:
   - uses: actions/checkout@v3
         
   - name: Install dependencies
+    shell: bash
     run: dotnet restore
 
-  - name: dotnet build ${{inputs.project}}
+  - name: dotnet build ${{inputs.project}}  
+    shell: bash
     run: dotnet build src/${{inputs.project}} --configuration Release --no-restore
 
   - name: dotnet test ${{inputs.project}}
+    shell: bash
     run: dotnet test src/${{inputs.project}}
     
   - name: update version in csproj
@@ -39,6 +42,7 @@ runs:
       version: ${{ steps.tag.outputs.tag }}
 
   - name: dotnet pack ${{inputs.project}}
+    shell: bash
     run: dotnet pack src/${{inputs.project}} -c Release --no-build
     
   - name: Publish Artifacts
@@ -48,6 +52,7 @@ runs:
       path: '**/${{inputs.project}}/bin/**/*.*nupkg'
     
   - name: Publish
+    shell: bash
     run: dotnet nuget push **/${{inputs.project}}/bin/**/*.nupkg -k ${{ inputs.nugetapikey }} -s https://api.nuget.org/v3/index.json
 
   - name: commit new version file
