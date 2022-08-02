@@ -1,0 +1,17 @@
+name: Pack OpenTelemetry.Instrumentation.Digma
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+env:
+  PROJECT: OpenTelemetry.Instrumentation.Digma
+jobs:
+  publish:
+    name: publish nuget
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ./pack-action
+        with:
+          project: ${{ env.PROJECT }}
+  
