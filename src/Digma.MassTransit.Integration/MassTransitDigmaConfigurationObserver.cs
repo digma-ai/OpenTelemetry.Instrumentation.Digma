@@ -1,6 +1,8 @@
 using System.Reflection;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
+using OpenTelemetry.Instrumentation.Digma;
+using OpenTelemetry.Instrumentation.Digma.Diagnostic;
 
 namespace Digma.MassTransit.Integration;
 
@@ -12,18 +14,10 @@ public static class MassTransitDiagnosticObserverExtensions
         var config = new MassTransitDigmaConfigurationObserver();
         action(config);
         serviceCollection.AddSingleton<IMassTransitDigmaConfigurationObserver>(config);
-        serviceCollection.AddConsumeObserver<DigmaMassTransitConsumeObserver>();
+        serviceCollection.AddTransient<IDigmaDiagnosticObserver, MasstransitDiagnosticObserver>();
+        serviceCollection.AddHostedService<DiagnosticInit>();
         return serviceCollection;
     }
-    // public static IServiceCollection UseDigmaMassTransitDiagnosticObserver(this IServiceCollection serviceCollection, Action<MassTransitDigmaConfigurationObserver> action)
-    // {
-    //     var config = new MassTransitDigmaConfigurationObserver();
-    //     action(config);
-    //     serviceCollection.AddSingleton<IMassTransitDigmaConfigurationObserver>(config);
-    //     serviceCollection.AddTransient<IDigmaDiagnosticObserver, MasstransitDiagnosticObserver>();
-    //     serviceCollection.AddHostedService<DiagnosticInit>();
-    //     return serviceCollection;
-    // }
 }
 
 

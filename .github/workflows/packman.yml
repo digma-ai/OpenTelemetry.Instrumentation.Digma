@@ -19,11 +19,6 @@ jobs:
           strip_v: true
       - uses: ./.github/workflows/composite/pack
         with:
-          project: OpenTelemetry.Instrumentation.Digma
-          nugetapikey: ${{ secrets.NUGET_PAT }}
-          version: ${{ steps.tag.outputs.tag }}
-      - uses: ./.github/workflows/composite/pack
-        with:
           project: Digma.MassTransit.Integration
           nugetapikey: ${{ secrets.NUGET_PAT }}
           version: ${{ steps.tag.outputs.tag }}
