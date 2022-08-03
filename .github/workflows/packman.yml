@@ -1,4 +1,4 @@
-name: Pack OpenTelemetry.Instrumentation.Digma
+name: Pack All Projects
 
 on:
   push:
