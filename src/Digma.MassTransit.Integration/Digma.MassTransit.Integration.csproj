@@ -4,7 +4,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <IsPackable>true</IsPackable>
-        <PackageId>Digma.MassTransit.Integration</PackageId>
+        <PackageId>OpenTel.Digma.MassTransit.Integration</PackageId>
         <Version>0.0.1</Version>
         <Authors>Digma Team</Authors>
         <Company>Digma</Company>
