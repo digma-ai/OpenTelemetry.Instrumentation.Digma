@@ -15,11 +15,13 @@ inputs:
 runs:
   using: "composite"
   steps:
- 
-    
-  # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-  #- uses: actions/checkout@v3
-        
+  - name: update version in csproj
+    id: package_version
+    uses: KageKirin/set-csproj-version@v0
+    with:
+      file: src/${{inputs.project}}/${{inputs.project}}.csproj
+      version: ${{ inputs.version }}
+      
   - name: Install dependencies
     shell: bash
     run: dotnet restore
@@ -32,13 +34,6 @@ runs:
     shell: bash
     run: dotnet test src/${{inputs.project}}
     
-  - name: update version in csproj
-    id: package_version
-    uses: KageKirin/set-csproj-version@v0
-    with:
-      file: src/${{inputs.project}}/${{inputs.project}}.csproj
-      version: ${{ inputs.version }}
-
   - name: dotnet pack ${{inputs.project}}
     shell: bash
     run: dotnet pack src/${{inputs.project}} -c Release --no-build
@@ -57,7 +52,7 @@ runs:
     uses: stefanzweifel/git-auto-commit-action@v4.14.0
     with:
       # Commit message
-      commit_message: "bump version"
+      commit_message: "bump version ${{ inputs.version }}"
       # Commit options (eg. --no-verify)
       branch: main
 
