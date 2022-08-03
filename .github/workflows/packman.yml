@@ -1,0 +1,29 @@
+name: Pack OpenTelemetry.Instrumentation.Digma
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+jobs:
+  publish:
+    name: publish nuget
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Get tag
+        id: tag
+        uses: dawidd6/action-get-tag@v1
+        with:
+          # Optionally strip `v` prefix
+          strip_v: true
+      - uses: ./.github/workflows/composite/pack
+        with:
+          project: OpenTelemetry.Instrumentation.Digma
+          nugetapikey: ${{ secrets.NUGET_PAT }}
+          version: ${{ steps.tag.outputs.tag }}
+      - uses: ./.github/workflows/composite/pack
+        with:
+          project: Digma.MassTransit.Integration
+          nugetapikey: ${{ secrets.NUGET_PAT }}
+          version: ${{ steps.tag.outputs.tag }}

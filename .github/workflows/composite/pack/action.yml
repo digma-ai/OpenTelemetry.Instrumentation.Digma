@@ -5,6 +5,9 @@ inputs:
   project:
     description: "Project name"
     required: true
+  version:
+    description: "Project Version"
+    required: true
   nugetapikey:
     description: "nuget API key"
     required: true
@@ -12,15 +15,10 @@ inputs:
 runs:
   using: "composite"
   steps:
-  - name: Get tag
-    id: tag
-    uses: dawidd6/action-get-tag@v1
-    with:
-      # Optionally strip `v` prefix
-      strip_v: true
+ 
     
   # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-  - uses: actions/checkout@v3
+  #- uses: actions/checkout@v3
         
   - name: Install dependencies
     shell: bash
@@ -39,7 +37,7 @@ runs:
     uses: KageKirin/set-csproj-version@v0
     with:
       file: src/${{inputs.project}}/${{inputs.project}}.csproj
-      version: ${{ steps.tag.outputs.tag }}
+      version: ${{ inputs.version }}
 
   - name: dotnet pack ${{inputs.project}}
     shell: bash
