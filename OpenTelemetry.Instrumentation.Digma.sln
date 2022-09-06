@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenTelemetry.Instrumentati
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Digma.MassTransit.Integration", "src\Digma.MassTransit.Integration\Digma.MassTransit.Integration.csproj", "{61EA0936-F7BE-4A78-85D7-4C312038CDE4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenTelemetry.Instrumentation.Digma.Tests", "src\OpenTelemetry.Instrumentation.Digma.Tests\OpenTelemetry.Instrumentation.Digma.Tests.csproj", "{79CE5248-0B20-488A-9BEB-2ECC5D936CAB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{61EA0936-F7BE-4A78-85D7-4C312038CDE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{61EA0936-F7BE-4A78-85D7-4C312038CDE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{61EA0936-F7BE-4A78-85D7-4C312038CDE4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79CE5248-0B20-488A-9BEB-2ECC5D936CAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79CE5248-0B20-488A-9BEB-2ECC5D936CAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79CE5248-0B20-488A-9BEB-2ECC5D936CAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79CE5248-0B20-488A-9BEB-2ECC5D936CAB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
