@@ -15,6 +15,7 @@
 // </copyright>
 
 using System.Diagnostics;
+using System.Net;
 using System.Reflection;
 using OpenTelemetry.Resources;
 
@@ -57,12 +58,13 @@ public static class DigmaInstrumentationHelperExtensions
             options.CommitId = Environment.GetEnvironmentVariable(options.CommitIdEnvVariable) ?? "";
         }
 
+        var hostName = Dns.GetHostName();
         if (options.Environment == null)
         {
             var env = Environment.GetEnvironmentVariable(options.EnvironmentEnvVariable);
             if (string.IsNullOrWhiteSpace(env))
             {
-                options.Environment = Environment.MachineName + "[local]";
+                options.Environment = hostName + "[local]";
             }
             else
             {
@@ -76,7 +78,7 @@ public static class DigmaInstrumentationHelperExtensions
             new KeyValuePair<string, object>("paths.working_directory", workingDirectory),
             new KeyValuePair<string, object>("scm.commit.id", options.CommitId),
             new KeyValuePair<string, object>("code.namespace.root", options.NamespaceRoot),
-            new KeyValuePair<string, object>("host.name", Environment.MachineName),
+            new KeyValuePair<string, object>("host.name", hostName),
             new KeyValuePair<string, object>("digma.span_mapping_pattern", options.SpanMappingPattern),
             new KeyValuePair<string, object>("digma.span_mapping_replacement", options.SpanMappingReplacement),
         });
