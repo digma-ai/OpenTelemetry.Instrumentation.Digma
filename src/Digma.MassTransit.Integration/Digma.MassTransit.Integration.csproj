@@ -5,7 +5,7 @@
         <Nullable>enable</Nullable>
         <IsPackable>true</IsPackable>
         <PackageId>OpenTel.Digma.MassTransit.Integration</PackageId>
-        <Version>0.6.8</Version>
+        <Version>0.6.9</Version>
         <Authors>Digma Team</Authors>
         <Company>Digma</Company>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
