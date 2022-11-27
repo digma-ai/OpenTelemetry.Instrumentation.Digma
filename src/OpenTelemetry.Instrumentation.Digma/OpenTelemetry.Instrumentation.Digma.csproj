@@ -3,7 +3,7 @@
   <PropertyGroup>
     <IsPackable>true</IsPackable>
     <PackageId>OpenTel.Instrumentation.Digma</PackageId>
-    <Version>0.6.9</Version>
+    <Version>0.6.10</Version>
     <Authors>Digma Team</Authors>
     <Company>Digma</Company>
     <TargetFramework>net6.0</TargetFramework>
