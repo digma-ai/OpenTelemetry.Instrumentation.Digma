@@ -29,6 +29,7 @@ public static class DigmaInstrumentationHelperExtensions
         Action<DigmaConfigurationOptions>? configure = null)
     {
         var workingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        var hostName = Dns.GetHostName();
 
         DigmaConfigurationOptions options = new DigmaConfigurationOptions();
         if (configure != null)
@@ -37,13 +38,13 @@ public static class DigmaInstrumentationHelperExtensions
         }
 
         //If namespace not provided try to get it from the calling method
-        if (string.IsNullOrEmpty(options.NamespaceRoot))
+        if (string.IsNullOrWhiteSpace(options.NamespaceRoot))
         {
             StackTrace stackTrace = new StackTrace();
             options.NamespaceRoot = stackTrace?.GetFrame(1)?.GetMethod()?.DeclaringType?.Namespace ?? "";
         }
 
-        if (string.IsNullOrEmpty(options.NamespaceRoot))
+        if (string.IsNullOrWhiteSpace(options.NamespaceRoot))
         {
             options.NamespaceRoot = Assembly.GetCallingAssembly().GetTypes()
                 .Where(x => x.Namespace != null)
@@ -53,23 +54,22 @@ public static class DigmaInstrumentationHelperExtensions
                 .FirstOrDefault();
         }
 
-        if (options.CommitId == null)
+        if (string.IsNullOrWhiteSpace(options.CommitId))
         {
             options.CommitId = Environment.GetEnvironmentVariable(options.CommitIdEnvVariable) ?? "";
         }
 
-        var hostName = Dns.GetHostName();
-        if (options.Environment == null)
+        if (string.IsNullOrWhiteSpace(options.Environment))
         {
-            var env = Environment.GetEnvironmentVariable(options.EnvironmentEnvVariable);
-            if (string.IsNullOrWhiteSpace(env))
-            {
-                options.Environment = hostName + "[local]";
-            }
-            else
-            {
-                options.Environment = env;
-            }
+            options.Environment = Environment.GetEnvironmentVariable(options.DigmaEnvironmentEnvVariable) ?? "";
+        }
+        if (string.IsNullOrWhiteSpace(options.Environment))
+        {
+            options.Environment = Environment.GetEnvironmentVariable(options.EnvironmentEnvVariable) ?? "";
+        }
+        if (string.IsNullOrWhiteSpace(options.Environment))
+        {
+            options.Environment = hostName + "[local]";
         }
 
         builder.AddAttributes(new[]
