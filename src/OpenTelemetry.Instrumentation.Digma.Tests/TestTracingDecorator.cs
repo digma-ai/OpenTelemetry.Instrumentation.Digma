@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Humanizer;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenTelemetry.Instrumentation.Digma.Helpers;
 using OpenTelemetry.Instrumentation.Digma.Tests.Stubs;
@@ -16,6 +18,8 @@ public class TestTracingDecorator
     private static readonly string ServiceInterfaceFqn =
         "OpenTelemetry.Instrumentation.Digma.Tests.Stubs.IDecoratedService";
 
+    private MockProcessor _mockProcessor = new ();
+    
     [TestMethod]
     public void Activity_Created_For_Attribute_Marked_Method()
     {
@@ -32,11 +36,13 @@ public class TestTracingDecorator
     [TestInitialize]
     public void SetupOtel()
     {
+        _mockProcessor.Reset();
         Sdk.CreateTracerProviderBuilder()
             .AddSource("*")
             .SetResourceBuilder(
                 ResourceBuilder.CreateDefault()
                     .AddService(serviceName: "test", serviceVersion: "2.2"))
+            .AddProcessor(_mockProcessor)
             .Build();
     }
 
@@ -92,6 +98,68 @@ public class TestTracingDecorator
         IDecoratedService tracingDecorator =
             TraceDecorator<IDecoratedService>.Create(service, decorateAllMethods: false);
         tracingDecorator.MethodNotExplicitlyMarkedForTracing(() => { Assert.IsNull(Activity.Current); });
+    }
+
+    [TestMethod]
+    public async Task Activity_Async_Void()
+    {
+        // Arrange
+        var service = new DecoratedService();
+        var decoratedService = TraceDecorator<IDecoratedService>.Create(service, decorateAllMethods: true);
+        
+        // Act #1
+        await decoratedService.AsyncVoid();
+        var activity = _mockProcessor.Activities.Single();
+        AssertActivity.SpanNameIs("AsyncVoid", activity);
+        AssertActivity.InstrumentationScopeIs("OpenTelemetry.Instrumentation.Digma.Tests.Stubs.DecoratedService", activity);
+        AssertActivity.DurationIs(100.Milliseconds(), 30.Milliseconds(), activity);
+        AssertActivity.HasTag("code.namespace", "OpenTelemetry.Instrumentation.Digma.Tests.Stubs.DecoratedService", activity);
+        AssertActivity.HasTag("code.function", "AsyncVoid", activity);
+    }
+    
+    [TestMethod]
+    public async Task Activity_Async_Value()
+    {
+        // Arrange
+        var service = new DecoratedService();
+        var decoratedService = TraceDecorator<IDecoratedService>.Create(service, decorateAllMethods: true);
+        
+        // Act #1
+        var result = await decoratedService.AsyncValue();
+        Assert.AreEqual(123, result);
+        
+        var activity = _mockProcessor.Activities.Single();
+        AssertActivity.SpanNameIs("AsyncValue", activity);
+        AssertActivity.InstrumentationScopeIs("OpenTelemetry.Instrumentation.Digma.Tests.Stubs.DecoratedService", activity);
+        AssertActivity.DurationIs(100.Milliseconds(), 30.Milliseconds(), activity);
+        AssertActivity.HasTag("code.namespace", "OpenTelemetry.Instrumentation.Digma.Tests.Stubs.DecoratedService", activity);
+        AssertActivity.HasTag("code.function", "AsyncValue", activity);
+    }
+    
+    [TestMethod]
+    public async Task Activity_Async_Error()
+    {
+        // Arrange
+        var service = new DecoratedService();
+        var decoratedService = TraceDecorator<IDecoratedService>.Create(service, decorateAllMethods: true);
+        
+        // Act #1
+        try
+        {
+            await decoratedService.AsyncError();
+            Assert.Fail();
+        }
+        catch (Exception e)
+        {
+            Assert.AreEqual(e.Message, "Bla");
+            
+            var activity = _mockProcessor.Activities.Single();
+            AssertActivity.SpanNameIs("AsyncError", activity);
+            AssertActivity.InstrumentationScopeIs("OpenTelemetry.Instrumentation.Digma.Tests.Stubs.DecoratedService", activity);
+            AssertActivity.DurationIs(100.Milliseconds(), 30.Milliseconds(), activity);
+            AssertActivity.HasTag("code.namespace", "OpenTelemetry.Instrumentation.Digma.Tests.Stubs.DecoratedService", activity);
+            AssertActivity.HasTag("code.function", "AsyncError", activity);
+        }
     }
 
     private void AssertHasCommonTags(Activity? activity,

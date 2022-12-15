@@ -12,6 +12,12 @@ public interface IDecoratedService
 
     public Task AsyncMethodExplicitlyMarkedForTracing(Action stateValidation);
 
+    public Task AsyncVoid();
+    
+    public Task<int> AsyncValue();
+    
+    public Task AsyncError();
+
     public void MethodNotExplicitlyMarkedForTracing(Action stateValidation);
 
     public void MethodWithStrangeParams1(Action stateValidation,
@@ -39,6 +45,24 @@ public class DecoratedService : IDecoratedService
         stateValidation();
     }
 
+
+    public async Task AsyncVoid()
+    {
+        await Task.Delay(100);
+    }
+
+    public async Task<int> AsyncValue()
+    {
+        await Task.Delay(100);
+        return 123;
+    }
+
+    public async Task AsyncError()
+    {
+        await Task.Delay(100);
+        throw new Exception("Bla");
+    }
+    
     public void MethodNotExplicitlyMarkedForTracing(Action stateValidation)
     {
         stateValidation();

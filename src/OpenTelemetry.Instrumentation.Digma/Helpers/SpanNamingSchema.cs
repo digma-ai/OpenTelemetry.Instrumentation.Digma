@@ -7,6 +7,14 @@ public interface IActivityNamingSchema
     public string GetSpanName(Type classType, MethodInfo method);
 }
 
+public class MethodNameSchema : IActivityNamingSchema
+{
+    public string GetSpanName(Type classType, MethodInfo method)
+    {
+        return method.Name;
+    }
+}
+
 public class MethodFullNameSchema : IActivityNamingSchema
 {
     public string GetSpanName(Type classType, MethodInfo method)

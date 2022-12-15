@@ -35,7 +35,7 @@ public class HttpEndpointDiagnosticObserver : IDigmaDiagnosticObserver
         var descriptor = endpoint?.Metadata.GetMetadata<ControllerActionDescriptor>();
         if (descriptor == null)
             return;
-        SpanUtils.AddCommonTags(descriptor.MethodInfo, Activity.Current);
+        SpanUtils.AddCommonTags(descriptor.ControllerTypeInfo, descriptor.MethodInfo, Activity.Current);
     }
 
     public bool CanHandle(string diagnosticListener)
