@@ -5,9 +5,9 @@ namespace OpenTelemetry.Instrumentation.Digma;
 
 public static class SpanUtils
 {
-    public static void AddCommonTags(MethodInfo methodInfo, Activity? activity)
+    public static void AddCommonTags(Type classType, MethodInfo methodInfo, Activity? activity)
     {
-        activity?.AddTag("code.namespace", methodInfo.DeclaringType?.ToString());
+        activity?.AddTag("code.namespace", classType.FullName);
         activity?.AddTag("code.function", methodInfo.Name);
         activity?.AddTag("code.function.parameter.types", BuildParameterTypes(methodInfo));
     }
