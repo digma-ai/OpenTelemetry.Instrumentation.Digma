@@ -22,14 +22,24 @@ public interface IDecoratedService
         bool[][][] jaggedArrayOfBools, short[,,,][,][,,] multiDimArrayOfShorts,
         long[,,][][,][] mixMultiDimAndJaggedArraysOfLongs
     );
-}
 
+    void MethodExplicitlyMarkedForTracingWithAttributes(Action action);
+}
+    
+[ActivitiesAttributes("att1:value1")]
 public class DecoratedService : IDecoratedService
 {
     [TraceActivity()]
     public void MethodExplicitlyMarkedForTracing(Action stateValidation)
     {
         var v = Activity.Current;
+        stateValidation();
+    }
+    
+    [TraceActivity()]
+    [ActivitiesAttributes("att1:value1")]
+    public void MethodExplicitlyMarkedForTracingWithAttributes(Action stateValidation)
+    {
         stateValidation();
     }
 

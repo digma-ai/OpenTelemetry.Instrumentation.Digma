@@ -28,6 +28,21 @@ public class TestTracingDecorator
                 "MethodExplicitlyMarkedForTracing", "Action");
         });
     }
+    
+    [TestMethod]
+    public void Attributes_Injected_To_Marked_Method()
+    {
+        DecoratedService service = new DecoratedService();
+        IDecoratedService tracingDecorator = TraceDecorator<IDecoratedService>.Create(service);
+        tracingDecorator.MethodExplicitlyMarkedForTracingWithAttributes(() =>
+        {
+            Assert.IsNotNull(Activity.Current);
+            AssertHasCommonTags(Activity.Current, ServiceInterfaceFqn,
+                "MethodExplicitlyMarkedForTracingWithAttributes", "Action");
+            AssertHasTag(Activity.Current, "att1", "value1");
+
+        });
+    }
 
     [TestInitialize]
     public void SetupOtel()
@@ -105,5 +120,11 @@ public class TestTracingDecorator
             CollectionAssert.Contains(kvpTags,
                 new KeyValuePair<string, string>("code.function.parameter.types", expectedParameterTypes));
         }
+    }
+    
+    private void AssertHasTag(Activity? activity, string name, string value)
+    {
+        var kvpTags = activity.Tags.ToArray();
+        CollectionAssert.Contains(kvpTags, new KeyValuePair<string, string>(name, value));
     }
 }

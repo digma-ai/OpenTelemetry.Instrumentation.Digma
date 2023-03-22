@@ -1,5 +1,7 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Reflection;
+using Microsoft.Extensions.Caching.Memory;
 using OpenTelemetry.Instrumentation.Digma.Helpers.Attributes;
 using OpenTelemetry.Trace;
 
@@ -11,6 +13,10 @@ public class TraceDecorator<TDecorated> : DispatchProxy where TDecorated : class
     private TDecorated _decorated;
     private IActivityNamingSchema _namingSchema = new MethodFullNameSchema();
     private bool _decorateAllMethods = true;
+
+    private readonly ConcurrentDictionary<string, NoActivityAttribute?> _methodNoActivityAttributeCache = new();
+    private readonly ConcurrentDictionary<string, ActivitiesAttributesAttribute?> _methodActivitiesTagsCache = new();
+    private readonly ConcurrentDictionary<string, TraceActivityAttribute?> _methodActivityAttributeCache = new();
 
     /// <summary>
     /// Creates a new TraceDecorator instance wrapping the specific object and implementing the TDecorated interface 
@@ -61,31 +67,72 @@ public class TraceDecorator<TDecorated> : DispatchProxy where TDecorated : class
 
     protected override object? Invoke(MethodInfo? targetMethod, object?[]? args)
     {
-        var noActivityAttribute = targetMethod.GetCustomAttribute<NoActivityAttribute>(false);
-        var activityAttribute = targetMethod.GetCustomAttribute<TraceActivityAttribute>(false);
-
-        if (noActivityAttribute == null && (_decorateAllMethods || activityAttribute != null))
+        if (targetMethod != null)
         {
-            var defaultSpanName = _namingSchema.GetSpanName(_decorated!.GetType(), targetMethod);
-            using var activity = _activity.StartActivity(activityAttribute?.Name ?? defaultSpanName);
+            
+            var noActivityAttribute = GetMethodNoActivityAttribute(targetMethod);
+            var activityAttribute = GetMethodActivityAttribute(targetMethod);
 
-            SpanUtils.AddCommonTags(targetMethod, activity);
-            InjectAttributes(targetMethod, activity);
-
-            if (activityAttribute?.RecordExceptions == false)
+            if (noActivityAttribute == null && (_decorateAllMethods || activityAttribute != null))
             {
-                return InvokeDecoratedExecution(targetMethod, args);
-            }
+                var defaultSpanName = _namingSchema.GetSpanName(_decorated!.GetType(), targetMethod);
+                using var activity = _activity.StartActivity(activityAttribute?.Name ?? defaultSpanName);
 
-            return WrapWithRecordException(activity, () => InvokeDecoratedExecution(targetMethod, args));
+                SpanUtils.AddCommonTags(targetMethod, activity);
+                InjectAttributes(targetMethod, activity);
+
+                if (activityAttribute?.RecordExceptions == false)
+                {
+                    return InvokeDecoratedExecution(targetMethod, args);
+                }
+
+                return WrapWithRecordException(activity, () => InvokeDecoratedExecution(targetMethod, args));
+            }
         }
 
         return InvokeDecoratedExecution(targetMethod, args);
     }
 
+    private TAttribute? GetInstanceMethodAttribute<TAttribute>(MethodInfo targetMethod) where TAttribute : Attribute
+    {
+        return _decorated.GetType().GetMethod(targetMethod.Name)?.GetCustomAttribute<TAttribute>(inherit:true);
+    }
+
+
+    private TAttribute? GetFromOrStoreInAttributeCache<TAttribute>(
+        MethodInfo targetMethod,
+        IDictionary<string, TAttribute?> cache) where TAttribute : Attribute
+    {
+        TAttribute? attributeInfo;
+
+        if (!cache.TryGetValue(targetMethod.Name, out attributeInfo))
+
+        {
+            attributeInfo = GetInstanceMethodAttribute<TAttribute>(targetMethod);
+            cache[targetMethod.Name] = attributeInfo;
+            
+        }
+        
+        return attributeInfo;
+    }
+    private ActivitiesAttributesAttribute? GetActivityTagsForInstanceMethod(MethodInfo targetMethod)
+    {
+        return GetFromOrStoreInAttributeCache(targetMethod, _methodActivitiesTagsCache);
+    }
+    
+    private TraceActivityAttribute? GetMethodActivityAttribute(MethodInfo targetMethod)
+    {
+        return GetFromOrStoreInAttributeCache(targetMethod, _methodActivityAttributeCache);
+    }
+    
+    private NoActivityAttribute? GetMethodNoActivityAttribute(MethodInfo targetMethod)
+    {
+        return GetFromOrStoreInAttributeCache(targetMethod, _methodNoActivityAttributeCache);
+    }
+
     private void InjectAttributes(MethodInfo targetMethod, Activity? activity)
     {
-        var methodActivityAttributes = targetMethod.GetCustomAttribute<ActivitiesAttributesAttribute>(inherit: false);
+        var methodActivityAttributes = GetActivityTagsForInstanceMethod(targetMethod);
         var classActivityAttributes =
             _decorated.GetType().GetCustomAttribute<ActivitiesAttributesAttribute>(inherit: false);
 
