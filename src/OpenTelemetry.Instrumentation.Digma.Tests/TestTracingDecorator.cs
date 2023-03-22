@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Humanizer;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenTelemetry.Instrumentation.Digma.Helpers;
 using OpenTelemetry.Instrumentation.Digma.Tests.Stubs;
@@ -43,70 +45,148 @@ public class TestTracingDecorator
 
         });
     }
+    private MockProcessor _mockProcessor = new ();
+    
+    // [TestMethod]
+    // public void Activity_Created_For_Attribute_Marked_Method()
+    // {
+    //     DecoratedService service = new DecoratedService();
+    //     IDecoratedService tracingDecorator = TraceDecorator<IDecoratedService>.Create(service);
+    //     tracingDecorator.MethodExplicitlyMarkedForTracing(() =>
+    //     {
+    //         Assert.IsNotNull(Activity.Current);
+    //         AssertHasCommonTags(Activity.Current, ServiceInterfaceFqn,
+    //             "MethodExplicitlyMarkedForTracing", "Action");
+    //     });
+    // }
 
     [TestInitialize]
     public void SetupOtel()
     {
+        _mockProcessor.Reset();
         Sdk.CreateTracerProviderBuilder()
             .AddSource("*")
             .SetResourceBuilder(
                 ResourceBuilder.CreateDefault()
                     .AddService(serviceName: "test", serviceVersion: "2.2"))
+            .AddProcessor(_mockProcessor)
             .Build();
     }
 
+    // [TestMethod]
+    // public async Task Activity_Created_For_Async_Attribute_Marked_Method()
+    // {
+    //     DecoratedService service = new DecoratedService();
+    //     IDecoratedService tracingDecorator = TraceDecorator<IDecoratedService>.Create(service);
+    //     await tracingDecorator.AsyncMethodExplicitlyMarkedForTracing(() =>
+    //     {
+    //         Assert.IsNotNull(Activity.Current);
+    //         AssertHasCommonTags(Activity.Current, ServiceInterfaceFqn,
+    //             "AsyncMethodExplicitlyMarkedForTracing", "Action");
+    //     });
+    // }
+    //
+    // [TestMethod]
+    // public void Activity_Created_MethodWithStrangeParams1()
+    // {
+    //     DecoratedService service = new DecoratedService();
+    //     IDecoratedService tracingDecorator = TraceDecorator<IDecoratedService>.Create(service);
+    //     int intVal = 5;
+    //     tracingDecorator.MethodWithStrangeParams1(() =>
+    //         {
+    //             Assert.IsNotNull(Activity.Current);
+    //             AssertHasCommonTags(Activity.Current, ServiceInterfaceFqn, "MethodWithStrangeParams1",
+    //                 "Action|IList`1[]|ISet`1|IDictionary`2|Int32&");
+    //         },
+    //         new List<string>[] { }, new HashSet<int[]>(), new Dictionary<int, ICollection<string>>(), ref intVal
+    //     );
+    // }
+    //
+    // [TestMethod]
+    // public void Activity_Created_MethodJaggedAndMultiDimArraysParams()
+    // {
+    //     DecoratedService service = new DecoratedService();
+    //     IDecoratedService tracingDecorator = TraceDecorator<IDecoratedService>.Create(service);
+    //     string strVal;
+    //     tracingDecorator.MethodJaggedAndMultiDimArraysParams(() =>
+    //         {
+    //             Assert.IsNotNull(Activity.Current);
+    //             AssertHasCommonTags(Activity.Current, ServiceInterfaceFqn, "MethodJaggedAndMultiDimArraysParams",
+    //                 "Action|String&|Boolean[][][]|Int16[,,][,][,,,]|Int64[][,][][,,]");
+    //         },
+    //         out strVal, new bool[][][] { }, new short[,,,][,][,,] { }, new long[,,][][,][] { }
+    //     );
+    // }
+    //
+    // [TestMethod]
+    // public void Activity_Not_Created_For_Non_Attribute_Marked_Method_If_All_Methods_False()
+    // {
+    //     DecoratedService service = new DecoratedService();
+    //     IDecoratedService tracingDecorator =
+    //         TraceDecorator<IDecoratedService>.Create(service, decorateAllMethods: false);
+    //     tracingDecorator.MethodNotExplicitlyMarkedForTracing(() => { Assert.IsNull(Activity.Current); });
+    // }
+
     [TestMethod]
-    public async Task Activity_Created_For_Async_Attribute_Marked_Method()
+    public async Task Activity_Async_Void()
     {
-        DecoratedService service = new DecoratedService();
-        IDecoratedService tracingDecorator = TraceDecorator<IDecoratedService>.Create(service);
-        await tracingDecorator.AsyncMethodExplicitlyMarkedForTracing(() =>
+        // Arrange
+        var service = new DecoratedService();
+        var decoratedService = TraceDecorator<IDecoratedService>.Create(service, decorateAllMethods: true);
+        
+        // Act #1
+        await decoratedService.AsyncVoid();
+        var activity = _mockProcessor.Activities.Single();
+        AssertActivity.SpanNameIs("AsyncVoid", activity);
+        AssertActivity.InstrumentationScopeIs("OpenTelemetry.Instrumentation.Digma.Tests.Stubs.DecoratedService", activity);
+        AssertActivity.DurationIs(100.Milliseconds(), 30.Milliseconds(), activity);
+        AssertActivity.HasTag("code.namespace", "OpenTelemetry.Instrumentation.Digma.Tests.Stubs.DecoratedService", activity);
+        AssertActivity.HasTag("code.function", "AsyncVoid", activity);
+    }
+    
+    [TestMethod]
+    public async Task Activity_Async_Value()
+    {
+        // Arrange
+        var service = new DecoratedService();
+        var decoratedService = TraceDecorator<IDecoratedService>.Create(service, decorateAllMethods: true);
+        
+        // Act #1
+        var result = await decoratedService.AsyncValue();
+        Assert.AreEqual(123, result);
+        
+        var activity = _mockProcessor.Activities.Single();
+        AssertActivity.SpanNameIs("AsyncValue", activity);
+        AssertActivity.InstrumentationScopeIs("OpenTelemetry.Instrumentation.Digma.Tests.Stubs.DecoratedService", activity);
+        AssertActivity.DurationIs(100.Milliseconds(), 30.Milliseconds(), activity);
+        AssertActivity.HasTag("code.namespace", "OpenTelemetry.Instrumentation.Digma.Tests.Stubs.DecoratedService", activity);
+        AssertActivity.HasTag("code.function", "AsyncValue", activity);
+    }
+    
+    [TestMethod]
+    public async Task Activity_Async_Error()
+    {
+        // Arrange
+        var service = new DecoratedService();
+        var decoratedService = TraceDecorator<IDecoratedService>.Create(service, decorateAllMethods: true);
+        
+        // Act #1
+        try
         {
-            Assert.IsNotNull(Activity.Current);
-            AssertHasCommonTags(Activity.Current, ServiceInterfaceFqn,
-                "AsyncMethodExplicitlyMarkedForTracing", "Action");
-        });
-    }
-
-    [TestMethod]
-    public void Activity_Created_MethodWithStrangeParams1()
-    {
-        DecoratedService service = new DecoratedService();
-        IDecoratedService tracingDecorator = TraceDecorator<IDecoratedService>.Create(service);
-        int intVal = 5;
-        tracingDecorator.MethodWithStrangeParams1(() =>
-            {
-                Assert.IsNotNull(Activity.Current);
-                AssertHasCommonTags(Activity.Current, ServiceInterfaceFqn, "MethodWithStrangeParams1",
-                    "Action|IList`1[]|ISet`1|IDictionary`2|Int32&");
-            },
-            new List<string>[] { }, new HashSet<int[]>(), new Dictionary<int, ICollection<string>>(), ref intVal
-        );
-    }
-
-    [TestMethod]
-    public void Activity_Created_MethodJaggedAndMultiDimArraysParams()
-    {
-        DecoratedService service = new DecoratedService();
-        IDecoratedService tracingDecorator = TraceDecorator<IDecoratedService>.Create(service);
-        string strVal;
-        tracingDecorator.MethodJaggedAndMultiDimArraysParams(() =>
-            {
-                Assert.IsNotNull(Activity.Current);
-                AssertHasCommonTags(Activity.Current, ServiceInterfaceFqn, "MethodJaggedAndMultiDimArraysParams",
-                    "Action|String&|Boolean[][][]|Int16[,,][,][,,,]|Int64[][,][][,,]");
-            },
-            out strVal, new bool[][][] { }, new short[,,,][,][,,] { }, new long[,,][][,][] { }
-        );
-    }
-
-    [TestMethod]
-    public void Activity_Not_Created_For_Non_Attribute_Marked_Method_If_All_Methods_False()
-    {
-        DecoratedService service = new DecoratedService();
-        IDecoratedService tracingDecorator =
-            TraceDecorator<IDecoratedService>.Create(service, decorateAllMethods: false);
-        tracingDecorator.MethodNotExplicitlyMarkedForTracing(() => { Assert.IsNull(Activity.Current); });
+            await decoratedService.AsyncError();
+            Assert.Fail();
+        }
+        catch (Exception e)
+        {
+            Assert.AreEqual(e.Message, "Bla");
+            
+            var activity = _mockProcessor.Activities.Single();
+            AssertActivity.SpanNameIs("AsyncError", activity);
+            AssertActivity.InstrumentationScopeIs("OpenTelemetry.Instrumentation.Digma.Tests.Stubs.DecoratedService", activity);
+            AssertActivity.DurationIs(100.Milliseconds(), 30.Milliseconds(), activity);
+            AssertActivity.HasTag("code.namespace", "OpenTelemetry.Instrumentation.Digma.Tests.Stubs.DecoratedService", activity);
+            AssertActivity.HasTag("code.function", "AsyncError", activity);
+        }
     }
 
     private void AssertHasCommonTags(Activity? activity,

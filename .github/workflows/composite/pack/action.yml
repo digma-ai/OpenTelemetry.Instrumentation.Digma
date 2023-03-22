@@ -47,12 +47,3 @@ runs:
   - name: Publish
     shell: bash
     run: dotnet nuget push **/${{inputs.project}}/bin/**/*.nupkg -k ${{ inputs.nugetapikey }} -s https://api.nuget.org/v3/index.json 
-
-  - name: commit new version file
-    uses: stefanzweifel/git-auto-commit-action@v4.14.0
-    with:
-      # Commit message
-      commit_message: "bump version ${{ inputs.version }}"
-      # Commit options (eg. --no-verify)
-      branch: main
-

@@ -21,7 +21,7 @@ public class DigmaMassTransitConsumeObserver : IConsumeObserver
         var methodInfo = _consumerMethodInfoMap.GetOrAdd(context.Message.GetType(), type => _configuration.GetConsumerMethodInfo(type));
         if (methodInfo is null) return;
         
-        SpanUtils.AddCommonTags(methodInfo,Activity.Current);
+        SpanUtils.AddCommonTags(methodInfo.DeclaringType, methodInfo,Activity.Current);
 
         await Task.CompletedTask;
     }
