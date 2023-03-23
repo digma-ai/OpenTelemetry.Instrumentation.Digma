@@ -16,7 +16,7 @@ namespace OpenTelemetry.Instrumentation.Digma.Tests;
 public class TestTracingDecorator
 {
     private static readonly string ServiceInterfaceFqn =
-        "OpenTelemetry.Instrumentation.Digma.Tests.Stubs.IDecoratedService";
+        "OpenTelemetry.Instrumentation.Digma.Tests.Stubs.DecoratedService";
 
     [TestMethod]
     public void Activity_Created_For_Attribute_Marked_Method()
@@ -173,8 +173,9 @@ public class TestTracingDecorator
         // Act #1
         try
         {
-            await decoratedService.AsyncError();
-            Assert.Fail();
+            var task = decoratedService.AsyncError();
+            await task;
+            throw task.Exception!;
         }
         catch (Exception e)
         {

@@ -55,9 +55,11 @@ public class DecoratedService : IDecoratedService
         stateValidation();
     }
 
-
+    [TraceActivity()]
     public async Task AsyncVoid()
     {
+        var v = Activity.Current;
+
         await Task.Delay(100);
     }
 

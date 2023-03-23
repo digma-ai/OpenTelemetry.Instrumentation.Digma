@@ -17,7 +17,6 @@ public class TraceDecorator<TDecorated> : DispatchProxy where TDecorated : class
     private readonly ConcurrentDictionary<string, NoActivityAttribute?> _methodNoActivityAttributeCache = new();
     private readonly ConcurrentDictionary<string, ActivitiesAttributesAttribute?> _methodActivitiesTagsCache = new();
     private readonly ConcurrentDictionary<string, TraceActivityAttribute?> _methodActivityAttributeCache = new();
-
     /// <summary>
     /// Creates a new TraceDecorator instance wrapping the specific object and implementing the TDecorated interface 
     /// </summary>
@@ -45,39 +44,60 @@ public class TraceDecorator<TDecorated> : DispatchProxy where TDecorated : class
         }
     }
 
-    private object? InvokeDecoratedExecution(Activity? activity, MethodInfo? targetMethod, object?[]? args, bool? recordException)
+    private bool IsAsync(MethodInfo targetMethod)
     {
+        var taskType = typeof(Task);
+        return targetMethod.ReturnType == taskType ||
+               targetMethod.ReturnType.IsSubclassOf(taskType);
+    }
+    private object? InvokeAsyncDecoratedExecution(Activity? activity, MethodInfo? targetMethod, object?[]? args,
+        bool? recordException)
+    {
+        activity.Start();
+        var resultTask = targetMethod.Invoke(_decorated, args) as Task;
+        
+        resultTask.ContinueWith(task =>
+        {
+            if (task.Exception != null && (recordException ?? true))
+            {
+                activity?.RecordException(task.Exception);
+            }
+
+            activity?.Stop();
+
+            activity?.Dispose();
+
+
+        },TaskContinuationOptions.AttachedToParent | TaskContinuationOptions.ExecuteSynchronously);
+
+        return resultTask;
+    }
+
+    private object? InvokeDecoratedExecution(Activity? activity, MethodInfo? targetMethod, object?[]? args,
+        bool? recordException)
+    {
+        
         object? result;
         try
         {
-            result = targetMethod.Invoke(_decorated, args);
+            using (activity)
+            {
+                result = targetMethod.Invoke(_decorated, args);
+            }
         }
         catch (Exception e)
         {
-            if(recordException ?? true)
+            if (recordException ?? true)
                 activity?.RecordException(e);
-            
-            activity?.Dispose();
+
             throw;
         }
         
-        if (result is Task resultTask)
-        {
-            resultTask.ContinueWith(task =>
-            {
-                if (task.Exception != null && (recordException ?? true))
-                {
-                    activity?.RecordException(task.Exception);
-                }
 
-                activity?.Dispose();
-            }, TaskContinuationOptions.AttachedToParent | TaskContinuationOptions.ExecuteSynchronously);
-            
-            return result;
-        }
-
-        activity?.Dispose();
         return result;
+
+
+
     }
 
     protected override object? Invoke(MethodInfo? targetMethod, object?[]? args)
@@ -88,23 +108,26 @@ public class TraceDecorator<TDecorated> : DispatchProxy where TDecorated : class
             var noActivityAttribute = GetMethodNoActivityAttribute(targetMethod);
             var activityAttribute = GetMethodActivityAttribute(targetMethod);
 
-            if (noActivityAttribute == null && (_decorateAllMethods || activityAttribute != null))
+            if (noActivityAttribute == null && _decorateAllMethods )
             {
                 var classType = _decorated!.GetType();
 
                 var defaultSpanName = _namingSchema.GetSpanName(classType, targetMethod);
-                using var activity = _activity.StartActivity(activityAttribute?.Name ?? defaultSpanName);
+                var activity = _activity.StartActivity(activityAttribute?.Name ?? defaultSpanName);
 
                 SpanUtils.AddCommonTags(classType,targetMethod, activity);
                 InjectAttributes(targetMethod, activity);
 
-                if (activityAttribute?.RecordExceptions == false)
+                if (IsAsync(targetMethod))
                 {
-                    return InvokeDecoratedExecution(targetMethod, args);
+                    return InvokeAsyncDecoratedExecution(activity, targetMethod, args,
+                        activityAttribute?.RecordExceptions);
                 }
-
+                
                 return InvokeDecoratedExecution(activity, targetMethod, args, activityAttribute?.RecordExceptions);
             }
+            
+
         }
 
         return InvokeDecoratedExecution(null, targetMethod, args, null);
@@ -155,7 +178,7 @@ public class TraceDecorator<TDecorated> : DispatchProxy where TDecorated : class
 
         if (methodActivityAttributes != null)
         {
-            foreach (var key in classActivityAttributes.Attributes.Keys)
+            foreach (var key in methodActivityAttributes.Attributes.Keys)
             {
                 activity.AddTag(key, methodActivityAttributes.Attributes[key]);
             }
@@ -165,7 +188,7 @@ public class TraceDecorator<TDecorated> : DispatchProxy where TDecorated : class
         {
             foreach (var key in classActivityAttributes.Attributes.Keys)
             {
-                activity.AddTag(key, methodActivityAttributes.Attributes[key]);
+                activity.AddTag(key, classActivityAttributes.Attributes[key]);
             }
         }
     }
