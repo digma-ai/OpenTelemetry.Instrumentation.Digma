@@ -16,8 +16,35 @@ namespace OpenTelemetry.Instrumentation.Digma.Tests;
 public class TestTracingDecorator
 {
     private static readonly string ServiceInterfaceFqn =
-        "OpenTelemetry.Instrumentation.Digma.Tests.Stubs.IDecoratedService";
+        "OpenTelemetry.Instrumentation.Digma.Tests.Stubs.DecoratedService";
 
+    [TestMethod]
+    public void Activity_Created_For_Attribute_Marked_Method()
+    {
+        DecoratedService service = new DecoratedService();
+        IDecoratedService tracingDecorator = TraceDecorator<IDecoratedService>.Create(service);
+        tracingDecorator.MethodExplicitlyMarkedForTracing(() =>
+        {
+            Assert.IsNotNull(Activity.Current);
+            AssertHasCommonTags(Activity.Current, ServiceInterfaceFqn,
+                "MethodExplicitlyMarkedForTracing", "Action");
+        });
+    }
+    
+    [TestMethod]
+    public void Attributes_Injected_To_Marked_Method()
+    {
+        DecoratedService service = new DecoratedService();
+        IDecoratedService tracingDecorator = TraceDecorator<IDecoratedService>.Create(service);
+        tracingDecorator.MethodExplicitlyMarkedForTracingWithAttributes(() =>
+        {
+            Assert.IsNotNull(Activity.Current);
+            AssertHasCommonTags(Activity.Current, ServiceInterfaceFqn,
+                "MethodExplicitlyMarkedForTracingWithAttributes", "Action");
+            AssertHasTag(Activity.Current, "att1", "value1");
+
+        });
+    }
     private MockProcessor _mockProcessor = new ();
     
     // [TestMethod]
@@ -146,8 +173,9 @@ public class TestTracingDecorator
         // Act #1
         try
         {
-            await decoratedService.AsyncError();
-            Assert.Fail();
+            var task = decoratedService.AsyncError();
+            await task;
+            throw task.Exception!;
         }
         catch (Exception e)
         {
@@ -173,5 +201,11 @@ public class TestTracingDecorator
             CollectionAssert.Contains(kvpTags,
                 new KeyValuePair<string, string>("code.function.parameter.types", expectedParameterTypes));
         }
+    }
+    
+    private void AssertHasTag(Activity? activity, string name, string value)
+    {
+        var kvpTags = activity.Tags.ToArray();
+        CollectionAssert.Contains(kvpTags, new KeyValuePair<string, string>(name, value));
     }
 }
