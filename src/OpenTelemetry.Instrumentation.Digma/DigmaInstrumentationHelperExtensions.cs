@@ -19,69 +19,73 @@ using System.Net;
 using System.Reflection;
 using OpenTelemetry.Resources;
 
-namespace OpenTelemetry.Instrumentation.Digma;
-
-public static class DigmaInstrumentationHelperExtensions
+namespace OpenTelemetry.Instrumentation.Digma
 {
-    private static readonly HashSet<string> IgnoreNamespaces = new() { "Microsoft", "System" };
 
-    public static ResourceBuilder AddDigmaAttributes(this ResourceBuilder builder,
-        Action<DigmaConfigurationOptions>? configure = null)
+    public static class DigmaInstrumentationHelperExtensions
     {
-        var workingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        var hostName = Dns.GetHostName();
+        private static readonly HashSet<string> IgnoreNamespaces = new HashSet<string>() {"Microsoft", "System"};
 
-        DigmaConfigurationOptions options = new DigmaConfigurationOptions();
-        if (configure != null)
+        public static ResourceBuilder AddDigmaAttributes(this ResourceBuilder builder,
+            Action<DigmaConfigurationOptions>? configure = null)
         {
-            configure(options);
-        }
+            var workingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var hostName = Dns.GetHostName();
 
-        //If namespace not provided try to get it from the calling method
-        if (string.IsNullOrWhiteSpace(options.NamespaceRoot))
-        {
-            StackTrace stackTrace = new StackTrace();
-            options.NamespaceRoot = stackTrace?.GetFrame(1)?.GetMethod()?.DeclaringType?.Namespace ?? "";
-        }
+            DigmaConfigurationOptions options = new DigmaConfigurationOptions();
+            if (configure != null)
+            {
+                configure(options);
+            }
 
-        if (string.IsNullOrWhiteSpace(options.NamespaceRoot))
-        {
-            options.NamespaceRoot = Assembly.GetCallingAssembly().GetTypes()
-                .Where(x => x.Namespace != null)
-                .Select(x => x.Namespace!.Split('.').First())
-                .Except(IgnoreNamespaces)
-                .Distinct()
-                .FirstOrDefault();
-        }
+            //If namespace not provided try to get it from the calling method
+            if (string.IsNullOrWhiteSpace(options.NamespaceRoot))
+            {
+                StackTrace stackTrace = new StackTrace();
+                options.NamespaceRoot = stackTrace?.GetFrame(1)?.GetMethod()?.DeclaringType?.Namespace ?? "";
+            }
 
-        if (string.IsNullOrWhiteSpace(options.CommitId))
-        {
-            options.CommitId = Environment.GetEnvironmentVariable(options.CommitIdEnvVariable) ?? "";
-        }
+            if (string.IsNullOrWhiteSpace(options.NamespaceRoot))
+            {
+                options.NamespaceRoot = Assembly.GetCallingAssembly().GetTypes()
+                    .Where(x => x.Namespace != null)
+                    .Select(x => x.Namespace!.Split('.').First())
+                    .Except(IgnoreNamespaces)
+                    .Distinct()
+                    .FirstOrDefault();
+            }
 
-        if (string.IsNullOrWhiteSpace(options.Environment))
-        {
-            options.Environment = Environment.GetEnvironmentVariable(options.DigmaEnvironmentEnvVariable) ?? "";
-        }
-        if (string.IsNullOrWhiteSpace(options.Environment))
-        {
-            options.Environment = Environment.GetEnvironmentVariable(options.EnvironmentEnvVariable) ?? "";
-        }
-        if (string.IsNullOrWhiteSpace(options.Environment))
-        {
-            options.Environment = hostName + "[local]";
-        }
+            if (string.IsNullOrWhiteSpace(options.CommitId))
+            {
+                options.CommitId = Environment.GetEnvironmentVariable(options.CommitIdEnvVariable) ?? "";
+            }
 
-        builder.AddAttributes(new[]
-        {
-            new KeyValuePair<string, object>("digma.environment", options.Environment),
-            new KeyValuePair<string, object>("paths.working_directory", workingDirectory),
-            new KeyValuePair<string, object>("scm.commit.id", options.CommitId),
-            new KeyValuePair<string, object>("code.namespace.root", options.NamespaceRoot),
-            new KeyValuePair<string, object>("host.name", hostName),
-            new KeyValuePair<string, object>("digma.span_mapping_pattern", options.SpanMappingPattern),
-            new KeyValuePair<string, object>("digma.span_mapping_replacement", options.SpanMappingReplacement),
-        });
-        return builder;
+            if (string.IsNullOrWhiteSpace(options.Environment))
+            {
+                options.Environment = Environment.GetEnvironmentVariable(options.DigmaEnvironmentEnvVariable) ?? "";
+            }
+
+            if (string.IsNullOrWhiteSpace(options.Environment))
+            {
+                options.Environment = Environment.GetEnvironmentVariable(options.EnvironmentEnvVariable) ?? "";
+            }
+
+            if (string.IsNullOrWhiteSpace(options.Environment))
+            {
+                options.Environment = hostName + "[local]";
+            }
+
+            builder.AddAttributes(new[]
+            {
+                new KeyValuePair<string, object>("digma.environment", options.Environment),
+                new KeyValuePair<string, object>("paths.working_directory", workingDirectory),
+                new KeyValuePair<string, object>("scm.commit.id", options.CommitId),
+                new KeyValuePair<string, object>("code.namespace.root", options.NamespaceRoot),
+                new KeyValuePair<string, object>("host.name", hostName),
+                new KeyValuePair<string, object>("digma.span_mapping_pattern", options.SpanMappingPattern),
+                new KeyValuePair<string, object>("digma.span_mapping_replacement", options.SpanMappingReplacement),
+            });
+            return builder;
+        }
     }
 }
