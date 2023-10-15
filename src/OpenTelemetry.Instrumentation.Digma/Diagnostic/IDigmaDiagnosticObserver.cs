@@ -1,8 +1,5 @@
-namespace OpenTelemetry.Instrumentation.Digma.Diagnostic
+namespace OpenTelemetry.Instrumentation.Digma.Diagnostic;
+public interface IDigmaDiagnosticObserver : IObserver<KeyValuePair<string, object?>>
 {
-
-    public interface IDigmaDiagnosticObserver : IObserver<KeyValuePair<string, object?>>
-    {
-        bool CanHandle(string diagnosticListener);
-    }
+    bool CanHandle(string diagnosticListener);
 }

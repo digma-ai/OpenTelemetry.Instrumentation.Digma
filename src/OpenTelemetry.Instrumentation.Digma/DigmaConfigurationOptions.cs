@@ -14,22 +14,20 @@
 // limitations under the License.
 // </copyright>
 
-namespace OpenTelemetry.Instrumentation.Digma
+namespace OpenTelemetry.Instrumentation.Digma;
+public class DigmaConfigurationOptions
 {
-    public class DigmaConfigurationOptions
-    {
-        private const string DEFAULT_COMMIT_ENV_VAR = "DEPLOYMENT_COMMIT_ID";
-        private const string DEFAULT_DEPLOYMENT_ENV_ENV_VAR = "DEPLOYMENT_ENV";
-        private const string DEFAULT_DIGMA_ENV_ENV_VAR = "DIGMA_ENV";
+    private const string DEFAULT_COMMIT_ENV_VAR = "DEPLOYMENT_COMMIT_ID";
+    private const string DEFAULT_DEPLOYMENT_ENV_ENV_VAR = "DEPLOYMENT_ENV";
+    private const string DEFAULT_DIGMA_ENV_ENV_VAR = "DIGMA_ENV";
 
-        public string? NamespaceRoot { get; set; } = null;
-        public string? Environment { get; set; } = null;
-        public string CommitIdEnvVariable { get; set; } = DEFAULT_COMMIT_ENV_VAR;
-        [Obsolete("Please use DigmaEnvironmentEnvVariable")]
-        public string EnvironmentEnvVariable { get; set; } = DEFAULT_DEPLOYMENT_ENV_ENV_VAR;
-        public string DigmaEnvironmentEnvVariable { get; set; } = DEFAULT_DIGMA_ENV_ENV_VAR;
-        public string? CommitId { get; set; } = null;
-        public string? SpanMappingPattern { get; set; } = "";
-        public string? SpanMappingReplacement { get; set; } = "";
-    }
+    public string? NamespaceRoot { get; set; } = null;
+    public string? Environment { get; set; } = null;
+    public string CommitIdEnvVariable { get; set; } = DEFAULT_COMMIT_ENV_VAR;
+    [Obsolete("Please use DigmaEnvironmentEnvVariable")]
+    public string EnvironmentEnvVariable { get; set; } = DEFAULT_DEPLOYMENT_ENV_ENV_VAR;
+    public string DigmaEnvironmentEnvVariable { get; set; } = DEFAULT_DIGMA_ENV_ENV_VAR;
+    public string? CommitId { get; set; } = null;
+    public string? SpanMappingPattern { get; set; } = "";
+    public string? SpanMappingReplacement { get; set; } = "";
 }

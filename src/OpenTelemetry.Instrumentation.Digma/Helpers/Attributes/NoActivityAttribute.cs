@@ -1,7 +1,6 @@
-namespace OpenTelemetry.Instrumentation.Digma.Helpers.Attributes
+namespace OpenTelemetry.Instrumentation.Digma.Helpers.Attributes;
+
+[AttributeUsage(AttributeTargets.Method, Inherited = false)]
+public class NoActivityAttribute : Attribute
 {
-    [AttributeUsage(AttributeTargets.Method, Inherited = false)]
-    public class NoActivityAttribute : Attribute
-    {
-    }
 }
