@@ -29,13 +29,12 @@ public class HttpEndpointDiagnosticObserver : IDigmaDiagnosticObserver
     {
         if (pair.Key != "Microsoft.AspNetCore.Routing.EndpointMatched")
             return;
-
-        HttpContext httpContext = (HttpContext) pair.Value;
+        
+        var httpContext = (HttpContext) pair.Value;
         if(httpContext == null)return;
-        var endpointFeature = httpContext.Features.Get<IEndpointFeature>();
-        var descriptor = endpointFeature.Endpoint.Metadata.GetMetadata<ControllerActionDescriptor>();
-        if (descriptor == null)
-            return;
+        var endpointFeature = httpContext.Features?.Get<IEndpointFeature>();
+        var descriptor = endpointFeature?.Endpoint.Metadata.GetMetadata<ControllerActionDescriptor>();
+        if (descriptor == null)  return;
         SpanUtils.AddCommonTags(descriptor.ControllerTypeInfo, descriptor.MethodInfo, Activity.Current);
     }
 
