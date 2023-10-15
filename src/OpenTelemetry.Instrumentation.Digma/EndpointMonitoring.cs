@@ -24,12 +24,13 @@ public class DiagnosticInit : IHostedService
         _observer.Dispose();
         return Task.CompletedTask;
     }
-    
-    
+
+
     private class DiagnosticSubscriber : IObserver<DiagnosticListener>, IDisposable
     {
         private readonly IEnumerable<IDigmaDiagnosticObserver> _diagnosticObservers;
         private readonly List<IDisposable> _subscriptions;
+
         public DiagnosticSubscriber(IEnumerable<IDigmaDiagnosticObserver> diagnosticObservers)
         {
             _diagnosticObservers = diagnosticObservers;
@@ -53,7 +54,7 @@ public class DiagnosticInit : IHostedService
         public void OnNext(DiagnosticListener value)
         {
             var diagnosticObserver = _diagnosticObservers.FirstOrDefault(o => o.CanHandle(value.Name));
-            if(diagnosticObserver is null) return;
+            if (diagnosticObserver == null) return;
             var subscription = value.Subscribe(diagnosticObserver);
             _subscriptions.Add(subscription);
         }
@@ -69,6 +70,5 @@ public class DiagnosticInit : IHostedService
         }
     }
 }
-
 
 

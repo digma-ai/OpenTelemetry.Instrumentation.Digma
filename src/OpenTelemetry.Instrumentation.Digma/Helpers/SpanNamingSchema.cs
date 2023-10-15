@@ -1,7 +1,6 @@
 using System.Reflection;
 
 namespace OpenTelemetry.Instrumentation.Digma.Helpers;
-
 public interface IActivityNamingSchema
 {
     public string GetSpanName(Type classType, MethodInfo method);

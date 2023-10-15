@@ -23,7 +23,7 @@ namespace OpenTelemetry.Instrumentation.Digma;
 
 public static class DigmaInstrumentationHelperExtensions
 {
-    private static readonly HashSet<string> IgnoreNamespaces = new() { "Microsoft", "System" };
+    private static readonly HashSet<string> IgnoreNamespaces = new HashSet<string>() {"Microsoft", "System"};
 
     public static ResourceBuilder AddDigmaAttributes(this ResourceBuilder builder,
         Action<DigmaConfigurationOptions>? configure = null)
@@ -63,10 +63,12 @@ public static class DigmaInstrumentationHelperExtensions
         {
             options.Environment = Environment.GetEnvironmentVariable(options.DigmaEnvironmentEnvVariable) ?? "";
         }
+
         if (string.IsNullOrWhiteSpace(options.Environment))
         {
             options.Environment = Environment.GetEnvironmentVariable(options.EnvironmentEnvVariable) ?? "";
         }
+
         if (string.IsNullOrWhiteSpace(options.Environment))
         {
             options.Environment = hostName + "[local]";

@@ -4,7 +4,6 @@ using OpenTelemetry.Instrumentation.Digma.Helpers.Attributes;
 using OpenTelemetry.Trace;
 
 namespace OpenTelemetry.Instrumentation.Digma.Helpers;
-
 public class TraceDecorator<TDecorated> : DispatchProxy where TDecorated : class
 {
     private ActivitySource _activity;
@@ -23,15 +22,16 @@ public class TraceDecorator<TDecorated> : DispatchProxy where TDecorated : class
         bool decorateAllMethods = true)
     {
         object proxy = Create<TDecorated, TraceDecorator<TDecorated>>()!;
-        ((TraceDecorator<TDecorated>)proxy!).SetParameters(decorated, activityNamingSchema, decorateAllMethods);
+        ((TraceDecorator<TDecorated>) proxy!).SetParameters(decorated, activityNamingSchema, decorateAllMethods);
 
-        return (TDecorated)proxy;
+        return (TDecorated) proxy;
     }
 
-    private void SetParameters(TDecorated decorated, IActivityNamingSchema? spanNamingSchema, bool decorateAllMethods)
+    private void SetParameters(TDecorated decorated, IActivityNamingSchema? spanNamingSchema,
+        bool decorateAllMethods)
     {
         _decorated = decorated;
-        _activity = new(_decorated!.GetType().FullName!);
+        _activity = new ActivitySource(_decorated!.GetType().FullName!);
         _decorateAllMethods = decorateAllMethods;
         if (spanNamingSchema != null)
         {
@@ -39,7 +39,8 @@ public class TraceDecorator<TDecorated> : DispatchProxy where TDecorated : class
         }
     }
 
-    private object? InvokeDecoratedExecution(Activity? activity, MethodInfo? targetMethod, object?[]? args, bool? recordException)
+    private object? InvokeDecoratedExecution(Activity? activity, MethodInfo? targetMethod, object?[]? args,
+        bool? recordException)
     {
         object? result;
         try
@@ -48,13 +49,13 @@ public class TraceDecorator<TDecorated> : DispatchProxy where TDecorated : class
         }
         catch (Exception e)
         {
-            if(recordException ?? true)
+            if (recordException ?? true)
                 activity?.RecordException(e);
-            
+
             activity?.Dispose();
             throw;
         }
-        
+
         if (result is Task resultTask)
         {
             resultTask.ContinueWith(task =>
@@ -66,7 +67,7 @@ public class TraceDecorator<TDecorated> : DispatchProxy where TDecorated : class
 
                 activity?.Dispose();
             }, TaskContinuationOptions.AttachedToParent | TaskContinuationOptions.ExecuteSynchronously);
-            
+
             return result;
         }
 
@@ -82,7 +83,7 @@ public class TraceDecorator<TDecorated> : DispatchProxy where TDecorated : class
         if (noActivityAttribute == null && (_decorateAllMethods || activityAttribute != null))
         {
             var classType = _decorated!.GetType();
-            
+
             var defaultSpanName = _namingSchema.GetSpanName(classType, targetMethod);
             var activity = _activity.StartActivity(activityAttribute?.Name ?? defaultSpanName);
 
@@ -97,7 +98,8 @@ public class TraceDecorator<TDecorated> : DispatchProxy where TDecorated : class
 
     private void InjectAttributes(MethodInfo targetMethod, Activity? activity)
     {
-        var methodActivityAttributes = targetMethod.GetCustomAttribute<ActivitiesAttributesAttribute>(inherit: false);
+        var methodActivityAttributes =
+            targetMethod.GetCustomAttribute<ActivitiesAttributesAttribute>(inherit: false);
         var classActivityAttributes =
             _decorated.GetType().GetCustomAttribute<ActivitiesAttributesAttribute>(inherit: false);
 

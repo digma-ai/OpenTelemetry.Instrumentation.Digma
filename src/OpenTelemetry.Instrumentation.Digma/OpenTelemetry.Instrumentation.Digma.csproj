@@ -6,15 +6,17 @@
     <Version>0.6.12</Version>
     <Authors>Digma Team</Authors>
     <Company>Digma</Company>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 
 
     <RootNamespace>OpenTelemetry.Instrumentation.Digma</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <LangVersion>10</LangVersion>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
     <PackageReference Include="OpenTelemetry" Version="1.3.0"/>
     <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.0.0-rc9.4"/>
   </ItemGroup>

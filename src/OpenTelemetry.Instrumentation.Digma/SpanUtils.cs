@@ -2,7 +2,6 @@
 using System.Reflection;
 
 namespace OpenTelemetry.Instrumentation.Digma;
-
 public static class SpanUtils
 {
     public static void AddCommonTags(Type classType, MethodInfo methodInfo, Activity? activity)

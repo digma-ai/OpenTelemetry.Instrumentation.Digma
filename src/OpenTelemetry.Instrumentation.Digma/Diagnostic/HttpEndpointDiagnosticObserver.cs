@@ -1,10 +1,10 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace OpenTelemetry.Instrumentation.Digma.Diagnostic;
-
 public static class HttpDiagnosticObserverExtensions
 {
     public static IServiceCollection UseDigmaHttpDiagnosticObserver(this IServiceCollection serviceCollection)
@@ -30,11 +30,11 @@ public class HttpEndpointDiagnosticObserver : IDigmaDiagnosticObserver
         if (pair.Key != "Microsoft.AspNetCore.Routing.EndpointMatched")
             return;
         
-        var context = (HttpContext) pair.Value;
-        var endpoint = context?.GetEndpoint();
-        var descriptor = endpoint?.Metadata.GetMetadata<ControllerActionDescriptor>();
-        if (descriptor == null)
-            return;
+        var httpContext = (HttpContext) pair.Value;
+        if(httpContext == null)return;
+        var endpointFeature = httpContext.Features?.Get<IEndpointFeature>();
+        var descriptor = endpointFeature?.Endpoint.Metadata.GetMetadata<ControllerActionDescriptor>();
+        if (descriptor == null)  return;
         SpanUtils.AddCommonTags(descriptor.ControllerTypeInfo, descriptor.MethodInfo, Activity.Current);
     }
 
