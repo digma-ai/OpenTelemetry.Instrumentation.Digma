@@ -59,6 +59,11 @@ public static class DigmaInstrumentationHelperExtensions
             options.CommitId = Environment.GetEnvironmentVariable(options.CommitIdEnvVariable) ?? "";
         }
 
+        if (string.IsNullOrWhiteSpace(options.EnvironmentId))
+        {
+            options.EnvironmentId = Environment.GetEnvironmentVariable(options.DigmaEnvironmentIdVariable) ?? "";
+        }
+        
         if (string.IsNullOrWhiteSpace(options.Environment))
         {
             options.Environment = Environment.GetEnvironmentVariable(options.DigmaEnvironmentEnvVariable) ?? "";
@@ -76,6 +81,7 @@ public static class DigmaInstrumentationHelperExtensions
 
         builder.AddAttributes(new[]
         {
+            new KeyValuePair<string, object>("digma.environment.id", options.EnvironmentId),
             new KeyValuePair<string, object>("digma.environment", options.Environment),
             new KeyValuePair<string, object>("paths.working_directory", workingDirectory),
             new KeyValuePair<string, object>("scm.commit.id", options.CommitId),
