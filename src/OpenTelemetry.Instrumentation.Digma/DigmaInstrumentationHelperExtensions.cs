@@ -78,9 +78,15 @@ public static class DigmaInstrumentationHelperExtensions
         {
             options.Environment = hostName + "[local]";
         }
+        
+        if (string.IsNullOrWhiteSpace(options.UserId))
+        {
+            options.UserId = Environment.GetEnvironmentVariable(options.DigmaUserIdVariable) ?? "";
+        }
 
         builder.AddAttributes(new[]
         {
+            new KeyValuePair<string, object>("digma.user.id", options.UserId),
             new KeyValuePair<string, object>("digma.environment.id", options.EnvironmentId),
             new KeyValuePair<string, object>("digma.environment", options.Environment),
             new KeyValuePair<string, object>("paths.working_directory", workingDirectory),
