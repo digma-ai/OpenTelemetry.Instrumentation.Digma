@@ -59,36 +59,12 @@ public static class DigmaInstrumentationHelperExtensions
             options.CommitId = Environment.GetEnvironmentVariable(options.CommitIdEnvVariable) ?? "";
         }
 
-        if (string.IsNullOrWhiteSpace(options.EnvironmentId))
-        {
-            options.EnvironmentId = Environment.GetEnvironmentVariable(options.DigmaEnvironmentIdVariable) ?? "";
-        }
-        
-        if (string.IsNullOrWhiteSpace(options.Environment))
-        {
-            options.Environment = Environment.GetEnvironmentVariable(options.DigmaEnvironmentEnvVariable) ?? "";
-        }
-
-        if (string.IsNullOrWhiteSpace(options.Environment))
-        {
-            options.Environment = Environment.GetEnvironmentVariable(options.EnvironmentEnvVariable) ?? "";
-        }
-
-        if (string.IsNullOrWhiteSpace(options.Environment))
-        {
-            options.Environment = hostName + "[local]";
-        }
-        
-        if (string.IsNullOrWhiteSpace(options.UserId))
-        {
-            options.UserId = Environment.GetEnvironmentVariable(options.DigmaUserIdVariable) ?? "";
-        }
+        SetEnvironment(options, builder);
+        SetEnvironmentType(options, builder);
+        SetUserId(builder, options);
 
         builder.AddAttributes(new[]
         {
-            new KeyValuePair<string, object>("digma.user.id", options.UserId),
-            new KeyValuePair<string, object>("digma.environment.id", options.EnvironmentId),
-            new KeyValuePair<string, object>("digma.environment", options.Environment),
             new KeyValuePair<string, object>("paths.working_directory", workingDirectory),
             new KeyValuePair<string, object>("scm.commit.id", options.CommitId),
             new KeyValuePair<string, object>("code.namespace.root", options.NamespaceRoot),
@@ -97,5 +73,60 @@ public static class DigmaInstrumentationHelperExtensions
             new KeyValuePair<string, object>("digma.span_mapping_replacement", options.SpanMappingReplacement),
         });
         return builder;
+    }
+
+    private static void SetUserId(ResourceBuilder builder, DigmaConfigurationOptions options)
+    {
+        if (string.IsNullOrWhiteSpace(options.UserId))
+        {
+            options.UserId = Environment.GetEnvironmentVariable(options.DigmaUserIdVariable) ?? null;
+            if (!string.IsNullOrWhiteSpace(options.UserId))
+                builder.AddAttributes(new[] {new KeyValuePair<string, object>("digma.user.id", options.UserId)});
+        }
+    }
+
+    private static void SetEnvironmentType(DigmaConfigurationOptions options, ResourceBuilder builder)
+    {
+        if (options.EnvironmentType == null)
+        {
+            string ?environmentTypeStr = Environment.GetEnvironmentVariable(options.DigmaEnvironmentTypeVariable);
+            if (!string.IsNullOrWhiteSpace(environmentTypeStr))
+            {
+                options.EnvironmentType =  Enum.Parse<EnvironmentType>(environmentTypeStr, true);
+            }
+        }
+        if (options.EnvironmentType != null)
+        {
+            builder.AddAttributes(new[] {new KeyValuePair<string, object>("digma.environment.type", options.EnvironmentType)});
+        }
+    }
+    
+    private static void SetEnvironment(DigmaConfigurationOptions options, ResourceBuilder builder)
+    {
+        if (string.IsNullOrWhiteSpace(options.EnvironmentId))
+        {
+            options.EnvironmentId = Environment.GetEnvironmentVariable(options.DigmaEnvironmentIdVariable) ?? null;
+        }
+        if (!string.IsNullOrWhiteSpace(options.EnvironmentId))
+        {
+            builder.AddAttributes(new[]
+            {
+                new KeyValuePair<string, object>("digma.environment.id", options.EnvironmentId),
+            });
+            return;
+        }
+        
+        
+        if (string.IsNullOrWhiteSpace(options.Environment))
+        {
+            options.Environment = Environment.GetEnvironmentVariable(options.DigmaEnvironmentEnvVariable) ?? null;
+            if (string.IsNullOrWhiteSpace(options.Environment)) 
+                options.Environment = Environment.GetEnvironmentVariable(options.EnvironmentEnvVariable) ?? null;
+        }
+        
+        if (!string.IsNullOrWhiteSpace(options.Environment))
+        {
+            builder.AddAttributes(new[] {new KeyValuePair<string, object>("digma.environment", options.Environment)});
+        }
     }
 }
