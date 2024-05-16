@@ -97,7 +97,7 @@ public static class DigmaInstrumentationHelperExtensions
         }
         if (options.EnvironmentType != null)
         {
-            builder.AddAttributes(new[] {new KeyValuePair<string, object>("digma.environment.type", options.EnvironmentType)});
+            builder.AddAttributes(new[] {new KeyValuePair<string, object>("digma.environment.type", options.EnvironmentType.ToString())});
         }
     }
     
