@@ -18,19 +18,19 @@ public class Plugin
             Logger.Log($"Initializing AssemblyLoad {assemblyName}");
             if (assemblyName == "System.Data")
             {
-                Patch();
+                Patch(args.LoadedAssembly);
             }
         };
         Logger.Log("Initializing ended");
     }
 
-    public void Patch()
+    public void Patch(Assembly systemDataAssembly)
     {
         Logger.Log("Patching started");
         var harmony = new Harmony("SqlClientPatch");
         // harmony.PatchAll();
-        
-        var sqlCommandType = Type.GetType("System.Data.SqlClient.SqlCommand, System.Data", throwOnError: false);
+
+        var sqlCommandType = systemDataAssembly.GetType("System.Data.SqlClient.SqlCommand", throwOnError: false);
         if (sqlCommandType == null)
         {
             Logger.Log("System.Data.SqlClient.SqlCommand not found.");
@@ -40,15 +40,15 @@ public class Plugin
         var targetMethodInfo = sqlCommandType.GetMethod("WriteBeginExecuteEvent", BindingFlags.Instance | BindingFlags.NonPublic);
         if (targetMethodInfo == null)
         {
-            Logger.Log("System.Data.SqlClient.SqlCommand not found.");
+            Logger.Log("WriteBeginExecuteEvent not found.");
             return;
         }
         
-        harmony.Patch(targetMethodInfo, transpiler: new HarmonyMethod(typeof(Plugin).GetMethod(nameof(Transpiler))));
+        harmony.Patch(targetMethodInfo, transpiler: new HarmonyMethod(typeof(Plugin).GetMethod(nameof(Transpiler), BindingFlags.Static | BindingFlags.NonPublic)));
         Logger.Log("Patching applied successfully.");
     }
     
-    private IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+    private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
     {
         var instructionList = new List<CodeInstruction>(instructions);
 
