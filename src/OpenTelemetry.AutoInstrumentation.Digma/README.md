@@ -18,4 +18,5 @@ dotnet pack -c Release
    OTEL_DOTNET_AUTO_PLUGINS=OpenTelemetry.AutoInstrumentation.Digma.Plugin, OpenTelemetry.AutoInstrumentation.Digma, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
    OTEL_DOTNET_AUTO_SQLCLIENT_SET_DBSTATEMENT_FOR_TEXT=true
    ```
-
+3. To activate the Extended Observability add `OTEL_DOTNET_AUTO_NAMESPACES` with a comma seperated list of namespaces,
+or classes (full name), you want their methods to be dynamically wrapped with `Activity`.
