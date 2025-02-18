@@ -19,6 +19,7 @@ public class Plugin
 
     private readonly Harmony _harmony;
     private readonly string[] _namespaces;
+    private readonly bool _includePrivateMethods;
     
     public Plugin()
     {
@@ -29,6 +30,8 @@ public class Plugin
             .Where(x => !string.IsNullOrWhiteSpace(x))
             .ToArray()
             ?? Array.Empty<string>();
+        _includePrivateMethods = Environment.GetEnvironmentVariable("OTEL_DOTNET_AUTO_INCLUDE_PRIVATE_METHODS")
+            ?.Equals("true", StringComparison.InvariantCultureIgnoreCase) == true;
     }
     
     public void Initializing()
@@ -87,7 +90,8 @@ public class Plugin
     private bool ShouldInstrumentMethod(Type type, MethodInfo methodInfo)
     {
         return methodInfo.DeclaringType == type &&
-               !methodInfo.IsAbstract;
+               !methodInfo.IsAbstract &&
+               (methodInfo.IsPublic || _includePrivateMethods);
     }
 
     private bool DoesAlreadyStartActivity(MethodInfo methodInfo)
