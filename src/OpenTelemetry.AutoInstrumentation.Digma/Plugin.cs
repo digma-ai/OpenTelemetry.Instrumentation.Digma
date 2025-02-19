@@ -20,6 +20,7 @@ public class Plugin
     private readonly Harmony _harmony;
     private readonly string[] _namespaces;
     private readonly bool _includePrivateMethods;
+    private readonly HashSet<Assembly> _scannedAssemblies = new();
     
     public Plugin()
     {
@@ -39,22 +40,28 @@ public class Plugin
         Logger.LogInfo("Initialization started");
         Logger.LogInfo($"Requested to auto-instrument {_namespaces.Length} namespaces:\n"+
                        string.Join("\n", _namespaces));
-
-        foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-        {
-            Logger.LogInfo($"Processing pre-loaded assembly {assembly.FullName}");
-            ProcessAssembly(assembly);
-        }
         
         AppDomain.CurrentDomain.AssemblyLoad += (sender, args) =>
         {
             Logger.LogInfo($"Processing lazy-loaded {args.LoadedAssembly.FullName}");
             ProcessAssembly(args.LoadedAssembly);
         };
+        
+        foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+        {
+            Logger.LogInfo($"Processing pre-loaded assembly {assembly.FullName}");
+            ProcessAssembly(assembly);
+        }
     }
 
     private void ProcessAssembly(Assembly assembly)
     {
+        lock (_scannedAssemblies)
+        {
+            if(!_scannedAssemblies.Add(assembly))
+                return;
+        }
+        
         var name = assembly.GetName().Name;
         if (name == "System.Data")
         {
@@ -119,7 +126,7 @@ public class Plugin
     
     private void PatchMethod(MethodInfo originalMethodInfo)
     {
-        var methodFullName = $"Patching {originalMethodInfo.GetType().FullName}.{originalMethodInfo.Name}";
+        var methodFullName = $"{originalMethodInfo.DeclaringType?.FullName}.{originalMethodInfo.Name}";
         try
         {
             var prefix = DoesAlreadyStartActivity(originalMethodInfo)
@@ -171,7 +178,7 @@ public class Plugin
         var classType = __originalMethod.DeclaringType;
         if(classType == null)
         {
-            __state = null;   
+            __state = null;
             return;
         }
         var activity = ActivitySourceProvider.GetOrCreate(classType).StartActivity(__originalMethod.Name);

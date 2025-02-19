@@ -48,7 +48,7 @@ public static class Logger
     {
         try
         {
-            var contents = $"[{DateTime.Now:u}] [{level.ToString().ToUpper()}] SqlClientPatch - {message}\n";
+            var contents = $"[{DateTime.Now:o}] [{level.ToString().ToUpper()}] {message}\n";
             Console.Write(contents);
             File.AppendAllText(FilePath, contents);
         }
