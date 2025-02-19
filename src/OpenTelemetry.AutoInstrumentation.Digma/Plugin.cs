@@ -11,7 +11,7 @@ namespace OpenTelemetry.AutoInstrumentation.Digma;
 
 public class Plugin
 {
-    private static readonly ActivitySource ActivitySource = new("OpenTelemetry.AutoInstrumentation.Digma");
+    private static readonly ActivitySourceProvider ActivitySourceProvider = new();
     private static readonly MethodInfo PrefixMethodInfo = typeof(Plugin).GetMethod(nameof(Prefix), BindingFlags.Static | BindingFlags.NonPublic);
     // private readonly MethodInfo _postfixMethodInfo = typeof(Plugin).GetMethod(nameof(Postfix), BindingFlags.Static | BindingFlags.NonPublic);
     private static readonly MethodInfo FinalizerMethodInfo = typeof(Plugin).GetMethod(nameof(Finalizer), BindingFlags.Static | BindingFlags.NonPublic);
@@ -84,13 +84,20 @@ public class Plugin
 
     private bool ShouldInstrumentType(Type type)
     {
-        return _namespaces.Any(ns => type.FullName?.StartsWith(ns, StringComparison.OrdinalIgnoreCase) == true);
+        return !typeof(Delegate).IsAssignableFrom(type) &&
+               _namespaces.Any(ns => type.FullName?.StartsWith(ns, StringComparison.OrdinalIgnoreCase) == true);
     }
 
     private bool ShouldInstrumentMethod(Type type, MethodInfo methodInfo)
     {
         return methodInfo.DeclaringType == type &&
                !methodInfo.IsAbstract &&
+               !methodInfo.IsSpecialName && // property accessors and operator overloading methods
+               methodInfo.Name != "GetHashCode" && 
+               methodInfo.Name != "Equals" && 
+               methodInfo.Name != "ToString" && 
+               methodInfo.Name != "Deconstruct" &&
+               methodInfo.Name != "<Clone>$" &&
                (methodInfo.IsPublic || _includePrivateMethods);
     }
 
@@ -161,7 +168,13 @@ public class Plugin
 
     private static void Prefix(MethodBase __originalMethod, out Activity __state)
     {
-        var activity = ActivitySource.StartActivity(__originalMethod.Name);
+        var classType = __originalMethod.DeclaringType;
+        if(classType == null)
+        {
+            __state = null;   
+            return;
+        }
+        var activity = ActivitySourceProvider.GetOrCreate(classType).StartActivity(__originalMethod.Name);
         activity?.SetTag(DigmaSemanticConventions.ExtendedObservabilityPackage, __originalMethod.DeclaringType?.Assembly.GetName().Name);
         activity?.SetTag(DigmaSemanticConventions.CodeNamespace, __originalMethod.DeclaringType?.FullName);
         activity?.SetTag(DigmaSemanticConventions.CodeFunction, __originalMethod.Name);
