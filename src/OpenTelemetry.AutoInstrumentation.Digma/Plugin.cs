@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Threading;
 using HarmonyLib;
 using OpenTelemetry.AutoInstrumentation.Digma.Utils;
 
@@ -41,6 +42,14 @@ public class Plugin
         Logger.LogInfo($"Requested to auto-instrument {_namespaces.Length} namespaces:\n"+
                        string.Join("\n", _namespaces));
         
+       new Thread(DelayedInitializing).Start();
+    }
+
+    private void DelayedInitializing()
+    {
+        Thread.Sleep(TimeSpan.FromSeconds(2));
+        Logger.LogInfo("Delayed Initialization started");
+        
         AppDomain.CurrentDomain.AssemblyLoad += (sender, args) =>
         {
             Logger.LogDebug($"Processing lazy-loaded {args.LoadedAssembly.FullName}");
@@ -53,7 +62,7 @@ public class Plugin
             ProcessAssembly(assembly);
         }
     }
-
+    
     private void ProcessAssembly(Assembly assembly)
     {
         lock (_scannedAssemblies)

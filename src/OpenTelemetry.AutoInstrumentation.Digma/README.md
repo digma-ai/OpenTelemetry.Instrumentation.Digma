@@ -15,6 +15,7 @@ dotnet pack -c Release
    ```
    OTEL_DOTNET_AUTO_PLUGINS=OpenTelemetry.AutoInstrumentation.Digma.Plugin, OpenTelemetry.AutoInstrumentation.Digma, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
    OTEL_DOTNET_AUTO_SQLCLIENT_SET_DBSTATEMENT_FOR_TEXT=true
+   OTEL_DOTNET_AUTO_TRACES_ADDITIONAL_SOURCES=*
    ```
 3. To activate the Extended Observability add `OTEL_DOTNET_AUTO_NAMESPACES` with a comma seperated list of namespaces,
 or classes (full name), you want their methods to be dynamically wrapped with `Activity`.
@@ -22,3 +23,13 @@ or classes (full name), you want their methods to be dynamically wrapped with `A
    ```
    OTEL_DOTNET_AUTO_INCLUDE_PRIVATE_METHODS=true
    ```
+   
+### Troubleshooting
+Logs location (default: `%ProgramData%\OpenTelemetry .NET AutoInstrumentation\logs`):
+```
+OTEL_DOTNET_AUTO_LOG_DIRECTORY=...
+```
+Logs verbosity can be either `none`, `debug`, `info`, `warn`, or `error` (default: `info`):
+```
+OTEL_LOG_LEVEL=...
+```
