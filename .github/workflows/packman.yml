@@ -27,3 +27,8 @@ jobs:
           project: Digma.MassTransit.Integration
           nugetapikey: ${{ secrets.NUGET_PAT }}
           version: ${{ steps.tag.outputs.tag }}
+      - uses: ./.github/workflows/composite/pack
+        with:
+          project: Digma.AutoInstrumentation.Digma
+          nugetapikey: ${{ secrets.NUGET_PAT }}
+          version: ${{ steps.tag.outputs.tag }}
