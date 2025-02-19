@@ -39,7 +39,7 @@ runs:
     run: dotnet pack src/${{inputs.project}} -c Release --no-build
     
   - name: Publish Artifacts
-    uses: actions/upload-artifact@v3
+    uses: actions/upload-artifact@v4
     with:
       name: ${{inputs.project}}-packages
       path: '**/${{inputs.project}}/bin/**/*.*nupkg'
