@@ -43,13 +43,13 @@ public class Plugin
         
         AppDomain.CurrentDomain.AssemblyLoad += (sender, args) =>
         {
-            Logger.LogInfo($"Processing lazy-loaded {args.LoadedAssembly.FullName}");
+            Logger.LogDebug($"Processing lazy-loaded {args.LoadedAssembly.FullName}");
             ProcessAssembly(args.LoadedAssembly);
         };
         
         foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
         {
-            Logger.LogInfo($"Processing pre-loaded assembly {assembly.FullName}");
+            Logger.LogDebug($"Processing pre-loaded assembly {assembly.FullName}");
             ProcessAssembly(assembly);
         }
     }
@@ -175,13 +175,9 @@ public class Plugin
 
     private static void Prefix(MethodBase __originalMethod, out Activity __state)
     {
-        var classType = __originalMethod.DeclaringType;
-        if(classType == null)
-        {
-            __state = null;
-            return;
-        }
-        var activity = ActivitySourceProvider.GetOrCreate(classType).StartActivity(__originalMethod.Name);
+        var activitySource = ActivitySourceProvider.GetOrCreate(__originalMethod.DeclaringType!);
+        var activity = activitySource.StartActivity(__originalMethod.Name);
+        Logger.LogDebug($"Opened Activity: {activity?.Source.Name}.{activity?.OperationName}");
         activity?.SetTag(DigmaSemanticConventions.ExtendedObservabilityPackage, __originalMethod.DeclaringType?.Assembly.GetName().Name);
         activity?.SetTag(DigmaSemanticConventions.CodeNamespace, __originalMethod.DeclaringType?.FullName);
         activity?.SetTag(DigmaSemanticConventions.CodeFunction, __originalMethod.Name);
@@ -206,7 +202,12 @@ public class Plugin
             activity?.SetStatus(ActivityStatusCode.Error);
         }
         
-        activity?.Dispose();
+        if(activity != null)
+        {
+            activity.Dispose();
+            Logger.LogDebug($"Closed Activity: {activity.Source.Name}.{activity.OperationName}");
+        }
+            
     }
     
     private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)

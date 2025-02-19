@@ -19,13 +19,17 @@ public class ActivitySourceProvider
             try
             {
                 if (_activitySources.TryGetValue(type, out var source))
+                {
+                    Logger.LogDebug($"ActivitySourceProvider returns {source.Name} (listened: {source.HasListeners()})");
                     return source;
+                }
 
                 var cookie = _lock.UpgradeToWriterLock(TimeSpan.FromMinutes(1));
                 try
                 {
                     source = new ActivitySource(type.Name);
                     _activitySources[type] = source;
+                    Logger.LogDebug($"ActivitySourceProvider created+return {source.Name} (listened: {source.HasListeners()})");
                     return source;
                 }
                 finally
@@ -40,6 +44,7 @@ public class ActivitySourceProvider
         }
         catch
         {
+            Logger.LogDebug($"ActivitySourceProvider returns default {_defaultActivitySource.Name} (listened: {_defaultActivitySource.HasListeners()})");
             return _defaultActivitySource;
         }
     }
