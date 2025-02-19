@@ -9,9 +9,7 @@ dotnet pack -c Release
 ```
 
 ### Install:
-1. Copy the dlls the to app's directory (where the exe or the rest of the dependencies are located).
-   - `0Harmony.dll`
-   - `OpenTelemetry.AutoInstrumentation.Digma.dll`
+1. Copy the dlls from the desired framework `src\OpenTelemetry.AutoInstrumentation.Digma\bin\Release\<framework>` the to app's directory (where the exe or the rest of the dependencies are located).
  
 2. Add this environment variable and value to the process:
    ```
@@ -20,3 +18,7 @@ dotnet pack -c Release
    ```
 3. To activate the Extended Observability add `OTEL_DOTNET_AUTO_NAMESPACES` with a comma seperated list of namespaces,
 or classes (full name), you want their methods to be dynamically wrapped with `Activity`.
+4. To apply Extended Observability not only on public methods, but on private ones as well set
+   ```
+   OTEL_DOTNET_AUTO_INCLUDE_PRIVATE_METHODS=true
+   ```
