@@ -101,6 +101,7 @@ public class Plugin
     private bool ShouldInstrumentType(Type type)
     {
         return !typeof(Delegate).IsAssignableFrom(type) &&
+               !type.IsGenericType &&
                _namespaces.Any(ns => type.FullName?.StartsWith(ns, StringComparison.OrdinalIgnoreCase) == true);
     }
 
@@ -109,6 +110,7 @@ public class Plugin
         return methodInfo.DeclaringType == type &&
                !methodInfo.IsAbstract &&
                !methodInfo.IsSpecialName && // property accessors and operator overloading methods
+               !methodInfo.IsGenericMethod &&
                methodInfo.Name != "GetHashCode" && 
                methodInfo.Name != "Equals" && 
                methodInfo.Name != "ToString" && 
