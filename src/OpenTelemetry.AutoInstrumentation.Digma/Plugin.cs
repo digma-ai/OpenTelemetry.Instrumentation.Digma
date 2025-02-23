@@ -95,7 +95,8 @@ public class Plugin
 
     private bool ShouldInstrumentAssembly(string assemblyName)
     {
-        return _namespaces.Any(ns => ns.StartsWith(assemblyName, StringComparison.OrdinalIgnoreCase));
+        return _namespaces.Any(ns => ns.StartsWith(assemblyName, StringComparison.OrdinalIgnoreCase) ||
+                                     assemblyName.StartsWith(ns, StringComparison.OrdinalIgnoreCase));
     }
 
     private bool ShouldInstrumentType(Type type)
