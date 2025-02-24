@@ -5,7 +5,7 @@ For now, this dll only fix the behaviour of `System.Data.SqlClient` to always ex
 Builds the artifacts for all the specified frameworks. If the desired framework is not there, edit the csproj file and
 add it to the `<TargetFrameworks>` section.
 ```
-dotnet pack -c Release
+./publish_all.sh
 ```
 
 ### Install:

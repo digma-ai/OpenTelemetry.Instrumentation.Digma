@@ -8,6 +8,7 @@ using System.Threading;
 using HarmonyLib;
 using OpenTelemetry.AutoInstrumentation.Digma.Utils;
 
+
 namespace OpenTelemetry.AutoInstrumentation.Digma;
 
 public class Plugin
