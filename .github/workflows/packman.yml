@@ -17,6 +17,10 @@ jobs:
         with:
           # Optionally strip `v` prefix
           strip_v: true
+      - name: Setup .NET 9.0
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 9.0.x
       - uses: ./.github/workflows/composite/pack
         with:
           project: OpenTelemetry.Instrumentation.Digma
