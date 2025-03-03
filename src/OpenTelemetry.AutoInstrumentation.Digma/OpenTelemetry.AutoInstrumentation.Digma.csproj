@@ -7,6 +7,10 @@
         <PackageId>OpenTel.AutoInstrumentation.Digma</PackageId>
         <RootNamespace>OpenTelemetry.AutoInstrumentation.Digma</RootNamespace>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+
+        <!-- Version placeholder - will be overriden by github action before publishing 
+             (see ".github/workflows/composite/pack/action.yml" line 18)-->
+        <Version>0.0.0</Version>
     </PropertyGroup>
 
     <ItemGroup>
