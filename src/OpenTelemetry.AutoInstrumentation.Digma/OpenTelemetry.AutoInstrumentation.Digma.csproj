@@ -7,6 +7,9 @@
         <PackageId>OpenTel.AutoInstrumentation.Digma</PackageId>
         <RootNamespace>OpenTelemetry.AutoInstrumentation.Digma</RootNamespace>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+        <Authors>Digma Team</Authors>
+        <Company>Digma</Company>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 
         <!-- Version placeholder - will be overriden by github action before publishing 
              (see ".github/workflows/composite/pack/action.yml" line 18)-->
