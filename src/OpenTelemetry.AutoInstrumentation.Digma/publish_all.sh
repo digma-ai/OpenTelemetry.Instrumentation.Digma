@@ -8,4 +8,6 @@ for tfm in "${targets[@]}"; do
     dotnet publish -c Release -f $tfm -o "bin/Publish/$tfm"
 done
 
- zip -r bin/Publish/OpenTelemetry.AutoInstrumentation.Digma.zip bin/Publish
+cd bin/Publish/
+zip -r OpenTelemetry.AutoInstrumentation.Digma.zip .
+cd ../../
