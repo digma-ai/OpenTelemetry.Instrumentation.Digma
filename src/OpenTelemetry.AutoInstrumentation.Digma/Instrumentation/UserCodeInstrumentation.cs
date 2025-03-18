@@ -11,7 +11,7 @@ public class UserCodeInstrumentation
 {
     private static readonly ActivitySourceProvider ActivitySourceProvider = new();
     private static readonly MethodInfo PrefixMethodInfo = typeof(UserCodeInstrumentation).GetMethod(nameof(Prefix), BindingFlags.Static | BindingFlags.NonPublic);
-    public static readonly MethodInfo FinalizerMethodInfo = typeof(UserCodeInstrumentation).GetMethod(nameof(Finalizer), BindingFlags.Static | BindingFlags.NonPublic);
+    private static readonly MethodInfo FinalizerMethodInfo = typeof(UserCodeInstrumentation).GetMethod(nameof(Finalizer), BindingFlags.Static | BindingFlags.NonPublic);
 
     private readonly Harmony _harmony;
     private readonly string[] _namespaces;

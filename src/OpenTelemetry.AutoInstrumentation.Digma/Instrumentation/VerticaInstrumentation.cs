@@ -11,7 +11,8 @@ public class VerticaInstrumentation
 {
     private static readonly ActivitySource ActivitySource = new("OpenTelemetry.Instrumentation.Vertica");
     
-    private static readonly MethodInfo VerticaCommandPrefixMethodInfo = typeof(VerticaInstrumentation).GetMethod(nameof(VerticaCommandPrefix), BindingFlags.Static | BindingFlags.NonPublic);
+    private static readonly MethodInfo PrefixMethodInfo = typeof(VerticaInstrumentation).GetMethod(nameof(Prefix), BindingFlags.Static | BindingFlags.NonPublic);
+    private static readonly MethodInfo FinalizerMethodInfo = typeof(VerticaInstrumentation).GetMethod(nameof(Finalizer), BindingFlags.Static | BindingFlags.NonPublic);
 
     private static MethodInfo CommandTextGetter;
     private static MethodInfo ConnectionGetter;
@@ -83,7 +84,7 @@ public class VerticaInstrumentation
                 .ToArray();
             foreach (var methodInfo in methodInfos)
             {
-                _harmony.Patch(methodInfo, prefix: VerticaCommandPrefixMethodInfo, finalizer: UserCodeInstrumentation.FinalizerMethodInfo);
+                _harmony.Patch(methodInfo, prefix: PrefixMethodInfo, finalizer: FinalizerMethodInfo);
                 Logger.LogInfo($"Patched {methodInfo.FullDescription()}");
             }
         }
@@ -93,7 +94,7 @@ public class VerticaInstrumentation
         }
     }
     
-    private static void VerticaCommandPrefix(MethodBase __originalMethod, object __instance, out Activity __state)
+    private static void Prefix(MethodBase __originalMethod, object __instance, out Activity __state)
     {
         var connection = ConnectionGetter.Invoke(__instance, null);
         var database = DatabaseGetter.Invoke(connection, null)?.ToString();
@@ -101,11 +102,24 @@ public class VerticaInstrumentation
         
         var activity = ActivitySource.StartActivity(database ?? __originalMethod.Name, ActivityKind.Client);
         Logger.LogDebug($"Opened Activity: {activity?.Source.Name}.{activity?.OperationName}");
-        activity?.SetCodeTags(__originalMethod);
         activity?.SetTag("db.statement", sqlStatement);
         activity?.SetTag("db.system", "vertica");
         
         __state = activity;
     }
 
+    private static void Finalizer(MethodBase __originalMethod, Activity __state, Exception __exception)
+    {
+        var activity = __state;
+        if (activity == null) 
+            return;
+        
+        if (__exception != null)
+        {
+            activity.RecordException(__exception);
+            activity.SetStatus(ActivityStatusCode.Error);
+        }            
+        activity.Dispose();
+        Logger.LogDebug($"Closed Activity: {activity.Source.Name}.{activity.OperationName}");
+    }
 }
