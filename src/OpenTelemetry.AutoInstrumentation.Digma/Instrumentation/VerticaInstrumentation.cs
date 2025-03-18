@@ -104,6 +104,7 @@ public class VerticaInstrumentation
         Logger.LogDebug($"Opened Activity: {activity?.Source.Name}.{activity?.OperationName}");
         activity?.SetTag("db.statement", sqlStatement);
         activity?.SetTag("db.system", "vertica");
+        activity?.SetTag("db.name", database);
         
         __state = activity;
     }
