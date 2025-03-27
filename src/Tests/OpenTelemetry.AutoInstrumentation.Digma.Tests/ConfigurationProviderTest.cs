@@ -90,7 +90,11 @@ public sealed class ConfigurationProviderTest
 
         isValid.Should().BeFalse();
         errors.Should().HaveCount(1);
+#if NETFRAMEWORK
+        errors[0].Should().Be("include[0].namespaces: parsing \"/[/\" - Unterminated [] set.");
+#else
         errors[0].Should().Be("include[0].namespaces: Invalid pattern '/[/' at offset 3. Unterminated [] set.");
+#endif
     }
 
     [TestMethod]
@@ -105,7 +109,11 @@ public sealed class ConfigurationProviderTest
 
         isValid.Should().BeFalse();
         errors.Should().HaveCount(1);
+#if NETFRAMEWORK
+        errors[0].Should().Be("include[0].classes: parsing \"/[/\" - Unterminated [] set.");
+#else
         errors[0].Should().Be("include[0].classes: Invalid pattern '/[/' at offset 3. Unterminated [] set.");
+#endif
     }
     
     [TestMethod]
@@ -120,7 +128,12 @@ public sealed class ConfigurationProviderTest
 
         isValid.Should().BeFalse();
         errors.Should().HaveCount(1);
+        
+#if NETFRAMEWORK
+        errors[0].Should().Be("include[0].methods: parsing \"/[/\" - Unterminated [] set.");
+#else
         errors[0].Should().Be("include[0].methods: Invalid pattern '/[/' at offset 3. Unterminated [] set.");
+#endif
     }
         
     [TestMethod]
@@ -138,8 +151,13 @@ public sealed class ConfigurationProviderTest
 
         isValid.Should().BeFalse();
         errors.Should().HaveCount(2);
+#if NETFRAMEWORK
+        errors[0].Should().Be("include[0].classes: parsing \"/[/\" - Unterminated [] set.");
+        errors[1].Should().Be("include[2].methods: parsing \"/[/\" - Unterminated [] set.");
+#else        
         errors[0].Should().Be("include[0].classes: Invalid pattern '/[/' at offset 3. Unterminated [] set.");
         errors[1].Should().Be("include[2].methods: Invalid pattern '/[/' at offset 3. Unterminated [] set.");
+#endif
     }
     
     private class DisposableFile : IDisposable
