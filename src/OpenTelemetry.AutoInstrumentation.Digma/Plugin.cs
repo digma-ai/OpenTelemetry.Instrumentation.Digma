@@ -42,6 +42,7 @@ public class Plugin
     public void SyncInitializing()
     {
         Logger.LogInfo("Sync Initialization started");
+        Logger.LogInfo("Env vars:\n"+string.Join("\n", EnvVars.GetAll().Select(x => $"{x.Key}={x.Value}")));
         
         AppDomain.CurrentDomain.AssemblyLoad += (sender, args) =>
         {

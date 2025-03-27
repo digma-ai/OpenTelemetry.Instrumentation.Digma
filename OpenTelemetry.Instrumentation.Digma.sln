@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenTelemetry.Instrumentati
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenTelemetry.AutoInstrumentation.Digma", "src\OpenTelemetry.AutoInstrumentation.Digma\OpenTelemetry.AutoInstrumentation.Digma.csproj", "{90C5C062-4E24-4C16-A1D1-77BDE5907267}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{27F80A25-54CF-454F-857B-A0A5782D5A1C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenTelemetry.AutoInstrumentation.Digma.Tests", "src\Tests\OpenTelemetry.AutoInstrumentation.Digma.Tests\OpenTelemetry.AutoInstrumentation.Digma.Tests.csproj", "{5C3CC7F6-09C4-40D4-866C-6F7C0A7A0BC9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,11 +37,18 @@ Global
 		{90C5C062-4E24-4C16-A1D1-77BDE5907267}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{90C5C062-4E24-4C16-A1D1-77BDE5907267}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{90C5C062-4E24-4C16-A1D1-77BDE5907267}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C3CC7F6-09C4-40D4-866C-6F7C0A7A0BC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C3CC7F6-09C4-40D4-866C-6F7C0A7A0BC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C3CC7F6-09C4-40D4-866C-6F7C0A7A0BC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C3CC7F6-09C4-40D4-866C-6F7C0A7A0BC9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1F556E97-6654-4720-AA94-2B3AB1FC8983}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5C3CC7F6-09C4-40D4-866C-6F7C0A7A0BC9} = {27F80A25-54CF-454F-857B-A0A5782D5A1C}
 	EndGlobalSection
 EndGlobal

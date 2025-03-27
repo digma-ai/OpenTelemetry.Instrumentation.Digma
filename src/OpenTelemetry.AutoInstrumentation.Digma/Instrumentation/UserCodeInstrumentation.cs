@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using HarmonyLib;
 using OpenTelemetry.AutoInstrumentation.Digma.Utils;
 
@@ -14,38 +17,40 @@ public class UserCodeInstrumentation
     private static readonly MethodInfo FinalizerMethodInfo = typeof(UserCodeInstrumentation).GetMethod(nameof(Finalizer), BindingFlags.Static | BindingFlags.NonPublic);
 
     private readonly Harmony _harmony;
-    private readonly string[] _namespaces;
-    private readonly bool _includePrivateMethods;
+    private readonly Configuration _configuration;
 
     public UserCodeInstrumentation(Harmony harmony)
     {
         _harmony = harmony;
-        var namespacesStr = Environment.GetEnvironmentVariable("OTEL_DOTNET_AUTO_NAMESPACES");
-        _namespaces = namespacesStr?.Split(',')
-                          .Select(x => x.Trim())
-                          .Where(x => !string.IsNullOrWhiteSpace(x))
-                          .ToArray()
-                      ?? Array.Empty<string>();
-        _includePrivateMethods = Environment.GetEnvironmentVariable("OTEL_DOTNET_AUTO_INCLUDE_PRIVATE_METHODS")
-            ?.Equals("true", StringComparison.InvariantCultureIgnoreCase) == true;
-        
-        Logger.LogInfo($"Requested to auto-instrument {_namespaces.Length} namespaces:\n"+
-                       string.Join("\n", _namespaces));
+        _configuration = ConfigurationProvider.GetConfiguration();
+
+        Logger.LogInfo("Configuration:\n" + _configuration.ToJson());
     }
     
     public void Instrument(Assembly assembly)
     {
-        var name = assembly.GetName().Name;
-        if (ShouldInstrumentAssembly(name))
+        foreach (var type in assembly.GetTypes())
         {
-            var relevantTypes = assembly.GetTypes().Where(ShouldInstrumentType).ToArray();
-            var methods = relevantTypes
-                .SelectMany(t => t
-                    .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                    .Where(m => ShouldInstrumentMethod(t,m)))
-                .ToArray();
+            // Match namespace+class
+            var typeIncludeRules = GetMatchingRules(type, _configuration.Include).ToArray();
+            var typeExcludeRules = GetMatchingRules(type, _configuration.Exclude).ToArray();
+            
+            if(!typeIncludeRules.Any())
+                continue;
+            
+            // Match methods
+            var methods = type
+                .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                .Where(m => CanInstrumentMethod(type, m));
+            
             foreach (var method in methods)
             {
+                var methodIncludeRules = GetMatchingRules(method, typeIncludeRules);
+                var methodExcludeRules = GetMatchingRules(method, typeExcludeRules);
+                
+                if(!methodIncludeRules.Any() || methodExcludeRules.Any())
+                    continue;
+                
                 PatchMethod(method);
             }
         }
@@ -71,21 +76,38 @@ public class UserCodeInstrumentation
         }
 
     }
+
+    private static InstrumentationRule[] GetMatchingRules(Type type, InstrumentationRule[] rules)
+    {
+        return rules.Where(r => IsMatched(r.Namespaces, type.Namespace) && IsMatched(r.Classes, type.Name)).ToArray();
+    }
     
-    private bool ShouldInstrumentAssembly(string assemblyName)
+    private static InstrumentationRule[] GetMatchingRules(MethodInfo method, InstrumentationRule[] rules)
     {
-        return _namespaces.Any(ns => ns.StartsWith(assemblyName, StringComparison.OrdinalIgnoreCase) ||
-                                     assemblyName.StartsWith(ns, StringComparison.OrdinalIgnoreCase));
+        return rules
+            .Where(r => IsMatched(r.Methods, method.Name))
+            .Where(r => r.AccessModifier == null ||
+                        (r.AccessModifier == MethodAccessModifier.Private && method.IsPrivate) ||
+                        (r.AccessModifier == MethodAccessModifier.Public && method.IsPublic))
+            .Where(r => r.SyncModifier == null ||
+                        (r.SyncModifier == MethodSyncModifier.Async && IsAsyncMethod(method)) ||
+                        (r.SyncModifier == MethodSyncModifier.Sync && !IsAsyncMethod(method)))
+            .ToArray();
     }
-
-    private bool ShouldInstrumentType(Type type)
+    
+    private static bool IsMatched(string pattern, string text)
     {
-        return !typeof(Delegate).IsAssignableFrom(type) &&
-               !type.IsGenericType &&
-               _namespaces.Any(ns => type.FullName?.StartsWith(ns, StringComparison.OrdinalIgnoreCase) == true);
-    }
+        if (string.IsNullOrWhiteSpace(text))
+            return true;
+        
+        var regexPattern = InstrumentationRule.IsRegex(pattern)
+            ? pattern
+            : "^" + Regex.Escape(pattern).Replace("\\*", ".*") + "$";
 
-    private bool ShouldInstrumentMethod(Type type, MethodInfo methodInfo)
+        return Regex.IsMatch(text, regexPattern);
+    }
+    
+    private bool CanInstrumentMethod(Type type, MethodInfo methodInfo)
     {
         return methodInfo.DeclaringType == type &&
                !methodInfo.IsAbstract &&
@@ -95,11 +117,18 @@ public class UserCodeInstrumentation
                methodInfo.Name != "Equals" && 
                methodInfo.Name != "ToString" && 
                methodInfo.Name != "Deconstruct" &&
-               methodInfo.Name != "<Clone>$" &&
-               (methodInfo.IsPublic || _includePrivateMethods);
+               methodInfo.Name != "<Clone>$";
     }
 
-    private bool DoesAlreadyStartActivity(MethodInfo methodInfo)
+    private static bool IsAsyncMethod(MethodInfo methodInfo)
+    {
+        return typeof(Task).IsAssignableFrom(methodInfo.ReturnType) ||
+               typeof(ValueTask).IsAssignableFrom(methodInfo.ReturnType) ||
+               (methodInfo.ReturnType.IsGenericType && 
+                typeof(ValueTask<>).IsAssignableFrom(methodInfo.ReturnType.GetGenericTypeDefinition()));
+    }
+
+    private static bool DoesAlreadyStartActivity(MethodInfo methodInfo)
     {
         var instructions = PatchProcessor.GetOriginalInstructions(methodInfo);
         foreach (var instruction in instructions)
