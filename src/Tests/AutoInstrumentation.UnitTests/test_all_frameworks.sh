@@ -5,5 +5,5 @@ IFS=';' read -ra targets <<< "$frameworks"
 
 for tfm in "${targets[@]}"; do
     echo "Testing for $tfm..."
-    dotnet test -f $tfm -p:ParallelizeTestCollections=false
+    dotnet test -f $tfm
 done

@@ -5,6 +5,8 @@
         <LangVersion>latest</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <AssemblyName>AutoInstrumentation.UnitTests</AssemblyName>
+        <RootNamespace>AutoInstrumentation.UnitTests</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
