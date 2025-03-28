@@ -4,6 +4,7 @@
 using Testcontainers.MsSql;
 using System.Data.SqlClient;
 using System.Diagnostics;
+using AutoInstrumentation.IntegrationTests.Utils;
 using Dapper;
 using FluentAssertions;
 using OpenTelemetry.AutoInstrumentation.Digma;

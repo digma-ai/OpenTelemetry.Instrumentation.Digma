@@ -54,11 +54,11 @@ public sealed class VerticaConfiguration : ContainerConfiguration
 
 public class VerticaBuilder : ContainerBuilder<VerticaBuilder, VerticaContainer, VerticaConfiguration>
 {
-    private const string DefaultImage = "vertica/vertica-ce";
-    private const int DefaultPort = 5433;
-    private const string DefaultDatabase = "master";
-    private const string DefaultUsername = "dbadmin";
-    private const string DefaultPassword = "yourStrong(!)Password";
+    public const string DefaultImage = "vertica/vertica-ce";
+    public const int DefaultPort = 5433;
+    public const string DefaultDatabase = "master";
+    public const string DefaultUsername = "dbadmin";
+    public const string DefaultPassword = "yourStrong(!)Password";
 
 
     public VerticaBuilder()
@@ -82,7 +82,7 @@ public class VerticaBuilder : ContainerBuilder<VerticaBuilder, VerticaContainer,
     {
         return base.Init()
             .WithImage(DefaultImage)
-            .WithPortBinding(DefaultPort, DefaultPort)
+            .WithPortBinding(DefaultPort, true)
             .WithEnvironment("ACCEPT_EULA", "Y")
             .WithDatabase(DefaultDatabase)
             .WithUsername(DefaultUsername)
@@ -159,6 +159,6 @@ public class VerticaContainer : DockerContainer, IDatabaseContainer
     
     public string GetConnectionString()
     {
-        return $"Host=localhost;Port=5433;Database={_configuration.Database};User={_configuration.Username};Password={_configuration.Password};";
+        return $"Host=localhost;Port={GetMappedPublicPort(VerticaBuilder.DefaultPort)};Database={_configuration.Database};User={_configuration.Username};Password={_configuration.Password};";
     }
 }
