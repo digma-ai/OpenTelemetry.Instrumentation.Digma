@@ -16,7 +16,7 @@ public class MssqlInstrumentationTest : BaseInstrumentationTest
 {
     private static MsSqlContainer _msSqlContainer;
     
-    [AssemblyInitialize]
+    [ClassInitialize]
     public static async Task Init(TestContext ctx)
     {
         _msSqlContainer = new MsSqlBuilder()
@@ -25,7 +25,7 @@ public class MssqlInstrumentationTest : BaseInstrumentationTest
         await _msSqlContainer.StartAsync();
     }
     
-    [AssemblyCleanup]
+    [ClassCleanup]
     public static async Task Cleanup()
     {
         await _msSqlContainer.DisposeAsync();

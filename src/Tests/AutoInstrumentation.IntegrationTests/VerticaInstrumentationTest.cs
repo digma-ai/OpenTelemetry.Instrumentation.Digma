@@ -14,14 +14,14 @@ public class VerticaInstrumentationTest : BaseInstrumentationTest
 {
     private static VerticaContainer _verticaContainer;
     
-    [AssemblyInitialize]
+    [ClassInitialize]
     public static async Task Init(TestContext ctx)
     {
         _verticaContainer = new VerticaBuilder().Build();
         await _verticaContainer.StartAsync(new CancellationTokenSource().Token);
     }
     
-    [AssemblyCleanup]
+    [ClassCleanup]
     public static async Task Cleanup()
     {
         await _verticaContainer.DisposeAsync();
