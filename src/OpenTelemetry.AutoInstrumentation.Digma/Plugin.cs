@@ -21,4 +21,10 @@ public class Plugin
             _autoInstrumentor.Instrument();
         }).Start();
     }
+
+    [Obsolete("Please use AutoInstrumentor.Instrument()")]
+    public void SyncInitializing()
+    {
+        _autoInstrumentor.Instrument();
+    }
 }
