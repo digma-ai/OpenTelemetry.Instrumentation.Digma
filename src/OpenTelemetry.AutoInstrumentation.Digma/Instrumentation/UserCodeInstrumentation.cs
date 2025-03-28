@@ -19,10 +19,10 @@ public class UserCodeInstrumentation
     private readonly Harmony _harmony;
     private readonly Configuration _configuration;
 
-    public UserCodeInstrumentation(Harmony harmony)
+    public UserCodeInstrumentation(Harmony harmony, Configuration configuration = null)
     {
         _harmony = harmony;
-        _configuration = ConfigurationProvider.GetConfiguration();
+        _configuration = configuration ?? ConfigurationProvider.GetConfiguration();
 
         Logger.LogInfo("Configuration:\n" + _configuration.ToJson());
     }
