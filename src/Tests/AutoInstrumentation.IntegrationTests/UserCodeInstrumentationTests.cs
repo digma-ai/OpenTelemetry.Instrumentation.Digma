@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using AutoInstrumentation.IntegrationTests.Utils;
 using FluentAssertions;
+using FluentAssertions.Extensions;
 using OpenTelemetry.AutoInstrumentation.Digma;
 using OpenTelemetry.AutoInstrumentation.Digma.Utils;
 
@@ -13,9 +14,7 @@ public class UserCodeInstrumentationTests : BaseInstrumentationTest
     [TestMethod]
     public void Sanity()
     {
-        using var instrument = new AutoInstrumentor().Instrument();
-
-        new AutoInstrumentor(new Configuration
+        var configuration = new Configuration
         {
             Include = new[]
             {
@@ -25,7 +24,9 @@ public class UserCodeInstrumentationTests : BaseInstrumentationTest
                     Methods = "MyMethod"
                 }
             }
-        }).Instrument();
+        };
+        
+        using var instrument = new AutoInstrumentor(configuration).Instrument();
 
         MyMethod();
         
@@ -34,6 +35,7 @@ public class UserCodeInstrumentationTests : BaseInstrumentationTest
         Activities[0].Source.Name.Should().Be("UserCodeInstrumentationTests");
         Activities[0].Kind.Should().Be(ActivityKind.Internal);
         Activities[0].Status.Should().Be(ActivityStatusCode.Ok);
+        Activities[0].Duration.Should().BeCloseTo(100.Milliseconds(), 20.Milliseconds());
         Activities[0].Tags.Should().Contain(
             new KeyValuePair<string, string?>("digma.instrumentation.extended.package", "AutoInstrumentation.IntegrationTests"),
             new KeyValuePair<string, string?>("code.namespace", "AutoInstrumentation.IntegrationTests.UserCodeInstrumentationTests"),
@@ -44,9 +46,7 @@ public class UserCodeInstrumentationTests : BaseInstrumentationTest
     [TestMethod]
     public void Error()
     {
-        using var instrument = new AutoInstrumentor().Instrument();
-
-        new AutoInstrumentor(new Configuration
+        var configuration = new Configuration
         {
             Include = new[]
             {
@@ -56,7 +56,9 @@ public class UserCodeInstrumentationTests : BaseInstrumentationTest
                     Methods = "ErroredMethod"
                 }
             }
-        }).Instrument();
+        };
+        
+        new AutoInstrumentor(configuration).Instrument();
 
         try
         {
@@ -77,7 +79,7 @@ public class UserCodeInstrumentationTests : BaseInstrumentationTest
 
     private void MyMethod()
     {
-        
+        Thread.Sleep(100.Milliseconds());
     }
 
     private void ErroredMethod()
