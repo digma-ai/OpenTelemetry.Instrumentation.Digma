@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
 using OpenTelemetry.AutoInstrumentation.Digma.Utils;
 
-namespace OpenTelemetry.AutoInstrumentation.Digma.Tests;
+namespace AutoInstrumentation.UnitTests;
 
 [TestClass]
 public sealed class ConfigurationProviderTest

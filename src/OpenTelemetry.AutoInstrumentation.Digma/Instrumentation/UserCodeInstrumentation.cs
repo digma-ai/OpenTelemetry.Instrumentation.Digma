@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using HarmonyLib;
 using OpenTelemetry.AutoInstrumentation.Digma.Utils;
 
@@ -29,30 +25,11 @@ public class UserCodeInstrumentation
     
     public void Instrument(Assembly assembly)
     {
-        foreach (var type in assembly.GetTypes())
+        var methods = MethodDiscovery.GetMethodsToPatch(assembly, _configuration);
+
+        foreach (var method in methods)
         {
-            // Match namespace+class
-            var typeIncludeRules = GetMatchingRules(type, _configuration.Include).ToArray();
-            var typeExcludeRules = GetMatchingRules(type, _configuration.Exclude).ToArray();
-            
-            if(!typeIncludeRules.Any())
-                continue;
-            
-            // Match methods
-            var methods = type
-                .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                .Where(m => CanInstrumentMethod(type, m));
-            
-            foreach (var method in methods)
-            {
-                var methodIncludeRules = GetMatchingRules(method, typeIncludeRules);
-                var methodExcludeRules = GetMatchingRules(method, typeExcludeRules);
-                
-                if(!methodIncludeRules.Any() || methodExcludeRules.Any())
-                    continue;
-                
-                PatchMethod(method);
-            }
+            PatchMethod(method);
         }
     }
     
@@ -74,58 +51,6 @@ public class UserCodeInstrumentation
         {
             Logger.LogError($"Failed to patch {methodFullName}", e);
         }
-
-    }
-
-    private static InstrumentationRule[] GetMatchingRules(Type type, InstrumentationRule[] rules)
-    {
-        return rules.Where(r => IsMatched(r.Namespaces, type.Namespace) && IsMatched(r.Classes, type.Name)).ToArray();
-    }
-    
-    private static InstrumentationRule[] GetMatchingRules(MethodInfo method, InstrumentationRule[] rules)
-    {
-        return rules
-            .Where(r => IsMatched(r.Methods, method.Name))
-            .Where(r => r.AccessModifier == null ||
-                        (r.AccessModifier == MethodAccessModifier.Private && method.IsPrivate) ||
-                        (r.AccessModifier == MethodAccessModifier.Public && method.IsPublic))
-            .Where(r => r.SyncModifier == null ||
-                        (r.SyncModifier == MethodSyncModifier.Async && IsAsyncMethod(method)) ||
-                        (r.SyncModifier == MethodSyncModifier.Sync && !IsAsyncMethod(method)))
-            .ToArray();
-    }
-    
-    private static bool IsMatched(string pattern, string text)
-    {
-        if (string.IsNullOrWhiteSpace(text))
-            return true;
-        
-        var regexPattern = InstrumentationRule.IsRegex(pattern)
-            ? pattern
-            : "^" + Regex.Escape(pattern).Replace("\\*", ".*") + "$";
-
-        return Regex.IsMatch(text, regexPattern);
-    }
-    
-    private bool CanInstrumentMethod(Type type, MethodInfo methodInfo)
-    {
-        return methodInfo.DeclaringType == type &&
-               !methodInfo.IsAbstract &&
-               !methodInfo.IsSpecialName && // property accessors and operator overloading methods
-               !methodInfo.IsGenericMethod &&
-               methodInfo.Name != "GetHashCode" && 
-               methodInfo.Name != "Equals" && 
-               methodInfo.Name != "ToString" && 
-               methodInfo.Name != "Deconstruct" &&
-               methodInfo.Name != "<Clone>$";
-    }
-
-    private static bool IsAsyncMethod(MethodInfo methodInfo)
-    {
-        return typeof(Task).IsAssignableFrom(methodInfo.ReturnType) ||
-               typeof(ValueTask).IsAssignableFrom(methodInfo.ReturnType) ||
-               (methodInfo.ReturnType.IsGenericType && 
-                typeof(ValueTask<>).IsAssignableFrom(methodInfo.ReturnType.GetGenericTypeDefinition()));
     }
 
     private static bool DoesAlreadyStartActivity(MethodInfo methodInfo)
