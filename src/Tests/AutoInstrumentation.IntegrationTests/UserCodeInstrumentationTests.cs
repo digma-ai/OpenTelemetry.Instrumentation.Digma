@@ -1,5 +1,4 @@
-﻿
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using AutoInstrumentation.IntegrationTests.Utils;
 using FluentAssertions;
 using FluentAssertions.Extensions;
@@ -58,7 +57,7 @@ public class UserCodeInstrumentationTests : BaseInstrumentationTest
             }
         };
         
-        new AutoInstrumentor(configuration).Instrument();
+        using var instrument = new AutoInstrumentor(configuration).Instrument();
 
         try
         {
