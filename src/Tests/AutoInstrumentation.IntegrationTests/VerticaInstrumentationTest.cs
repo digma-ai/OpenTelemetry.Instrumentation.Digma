@@ -39,7 +39,7 @@ public class VerticaInstrumentationTest : BaseInstrumentationTest
         await using var connection = new VerticaConnection(_verticaContainer.GetConnectionString());
         connection.Open();
 
-        await connection.QueryAsync("select node_name, node_state, node_address, is_primary, is_readonly from nodes");
+        await connection.ExecuteReaderAsync("select node_name, node_state, node_address, is_primary, is_readonly from nodes");
 
         Activities.Should().HaveCount(1);
         Activities[0].OperationName.Should().Be("master");
