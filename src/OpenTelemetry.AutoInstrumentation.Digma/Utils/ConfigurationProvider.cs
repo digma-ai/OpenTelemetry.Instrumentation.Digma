@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
@@ -90,7 +91,7 @@ public static class ConfigurationProvider
             Logger.LogInfo($"Rules file was not found at '{filePath}'");
         }
         
-        filePath = Path.Combine(Directory.GetCurrentDirectory(), RuleFileDefaultName);
+        filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), RuleFileDefaultName);
         if (File.Exists(filePath))
         {
             Logger.LogInfo($"Rules file found at '{filePath}'");

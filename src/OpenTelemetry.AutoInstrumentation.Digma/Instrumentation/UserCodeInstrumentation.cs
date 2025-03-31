@@ -25,7 +25,16 @@ public class UserCodeInstrumentation
     
     public void Instrument(Assembly assembly)
     {
-        var methods = MethodDiscovery.GetMethodsToPatch(assembly, _configuration);
+        MethodInfo[] methods;
+        try
+        {
+            methods = MethodDiscovery.GetMethodsToPatch(assembly, _configuration);
+        }
+        catch (Exception e)
+        {
+            Logger.LogError($"Failed to discover methods to instrument in '{assembly.FullName}'", e);
+            return;
+        }
 
         foreach (var method in methods)
         {
