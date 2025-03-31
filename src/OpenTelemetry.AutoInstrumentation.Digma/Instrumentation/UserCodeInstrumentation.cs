@@ -95,6 +95,13 @@ public class UserCodeInstrumentation
                methodInfo.Name != "Equals" && 
                methodInfo.Name != "ToString" && 
                methodInfo.Name != "Deconstruct" &&
+               methodInfo.Name != "MoveNext" &&
+               methodInfo.Name != "SetStateMachine" &&
+               methodInfo.Name != "PrintMembers" &&
+               methodInfo.Name != "Dispose" &&
+               methodInfo.Name != "BuildKey" &&
+               methodInfo.Name != "IsEmpty" &&
+               methodInfo.Name != "GetResultByIndex" &&
                methodInfo.Name != "<Clone>$" &&
                (methodInfo.IsPublic || _includePrivateMethods);
     }
