@@ -95,6 +95,8 @@ public static class MethodDiscovery
                methodInfo.Name != "MoveNext" &&
                methodInfo.Name != "SetStateMachine" &&
                methodInfo.Name != "PrintMembers" &&
+               methodInfo.Name != "Dispose" &&
+               methodInfo.Name != "GetEnumerator" &&
                methodInfo.Name != "<Clone>$";
     }
 
