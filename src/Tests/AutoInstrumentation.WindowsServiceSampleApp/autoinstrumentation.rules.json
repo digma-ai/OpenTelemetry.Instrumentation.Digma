@@ -1,0 +1,8 @@
+﻿{
+  "include":[
+    {
+      "namespaces": "AutoInstrumentation*",
+      "classes": "UsersRepository"
+    }
+  ]
+}

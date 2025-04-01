@@ -2,7 +2,7 @@
 using System.ServiceProcess;
 using Microsoft.Win32;
 
-namespace AutoInstrumentation.ZeroCodeTests;
+namespace AutoInstrumentation.ZeroCodeTests.OsServices;
 
 public class WindowsServiceManager
 {
@@ -23,17 +23,26 @@ public class WindowsServiceManager
         {
             x["SERVICE_NAME"] = serviceName;
         });
-        // RunSc("start", serviceName);
-        // WaitForStatus(serviceName, ServiceControllerStatus.Running);
     }
     
-    public void InstrumentService(string serviceName)
+    public void InstrumentService(string serviceName, int otelCollectorPort, string otelCollectorProtocol)
     {
         var command = @$"
             Import-Module '{Path.Combine(Directory.GetCurrentDirectory(), "OpenTelemetry.DotNet.Auto.psm1")}';
             Register-OpenTelemetryForWindowsService -WindowsServiceName '{serviceName}' -OTelServiceName '{serviceName}';
         ";
         RunPowershell("-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", $"\"{command}\"");
+        WaitForStatus(serviceName, ServiceControllerStatus.Running);
+
+        Console.WriteLine("Set otel collector env vars");
+        EditServiceEnvironmentVariables(serviceName, x =>
+        {
+            x["OTEL_DOTNET_AUTO_TRACES_ADDITIONAL_SOURCES"] = "*";
+            x["OTEL_EXPORTER_OTLP_TRACES_ENDPOINT"] = $"http://127.0.0.1:{otelCollectorPort}";
+            x["OTEL_EXPORTER_OTLP_TRACES_PROTOCOL"] = otelCollectorProtocol;
+            x["OTEL_DOTNET_AUTO_PLUGINS"] = "OpenTelemetry.AutoInstrumentation.Digma.Plugin, OpenTelemetry.AutoInstrumentation.Digma";
+        });
+        RunPowershell("Restart-Service", serviceName);
         WaitForStatus(serviceName, ServiceControllerStatus.Running);
     }
     

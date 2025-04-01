@@ -5,7 +5,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 
-
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .WriteTo.File(Path.Combine(
