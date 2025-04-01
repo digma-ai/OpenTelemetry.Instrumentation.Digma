@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OpenTelemetry.Proto.Collector.Trace.V1;
 
 namespace AutoInstrumentation.ZeroCodeTests.OtelCollector;
 
@@ -24,4 +25,6 @@ public class OtelCollectorInitializer
     }
 
     public static int Port => _otlpCollectorServer.Port;
+    
+    public static IReadOnlyList<ExportTraceServiceRequest> ReceivedSpans => _otlpCollectorServer.ReceivedSpans;
 }

@@ -36,14 +36,6 @@ public class WindowsServiceTests
     {
         _windowsServiceManager.IsServiceRunning(_serviceName).Should().BeTrue();
         Thread.Sleep(10.Seconds());
-        
-        
-        var channel = GrpcChannel.ForAddress($"http://localhost:{OtelCollectorInitializer.Port}");
-        var client = new TraceService.TraceServiceClient(channel);
-
-        // Send an empty trace export request just to test
-        var request = new ExportTraceServiceRequest();
-        var response = client.Export(request);
-        Console.WriteLine(response);
+        OtelCollectorInitializer.ReceivedSpans.Should().NotBeEmpty();
     }
 }

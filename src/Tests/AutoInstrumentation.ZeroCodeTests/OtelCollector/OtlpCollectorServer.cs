@@ -10,7 +10,7 @@ public class OtlpCollectorServer : IAsyncDisposable
 
     private OtlpCollectorServer()
     {
-        var serverPort = new ServerPort("localhost", 0, ServerCredentials.Insecure);
+        var serverPort = new ServerPort("127.0.0.1", 0, ServerCredentials.Insecure);
         _server = new Server
         {
             Services = { TraceService.BindService(_collectorImpl) },
@@ -23,6 +23,8 @@ public class OtlpCollectorServer : IAsyncDisposable
     }
     
     public int Port { get; }
+
+    public IReadOnlyList<ExportTraceServiceRequest> ReceivedSpans => _collectorImpl.ReceivedSpans;
 
     public static OtlpCollectorServer Start()
     {
