@@ -32,12 +32,12 @@ jobs:
 
     - name: Test OpenTelemetry.Instrumentation.Digma.Tests
       run: |
-        dotnet test ./OpenTelemetry.Instrumentation.Digma/OpenTelemetry.Instrumentation.Digma.Tests --no-build --verbosity normal
+        dotnet test ./src/OpenTelemetry.Instrumentation.Digma.Tests --no-build --verbosity normal
         
     - name: Test AutoInstrumentation.UnitTests
       run: |
-        dotnet test ./OpenTelemetry.Instrumentation.Digma/Tests/AutoInstrumentation.UnitTests --framework net5.0 --no-build --verbosity normal
-        dotnet test ./OpenTelemetry.Instrumentation.Digma/Tests/AutoInstrumentation.UnitTests --framework net6.0 --no-build --verbosity normal
-        dotnet test ./OpenTelemetry.Instrumentation.Digma/Tests/AutoInstrumentation.UnitTests --framework net7.0 --no-build --verbosity normal
-        dotnet test ./OpenTelemetry.Instrumentation.Digma/Tests/AutoInstrumentation.UnitTests --framework net8.0 --no-build --verbosity normal
-        dotnet test ./OpenTelemetry.Instrumentation.Digma/Tests/AutoInstrumentation.UnitTests --framework net9.0 --no-build --verbosity normal
+        dotnet test ./src/Tests/AutoInstrumentation.UnitTests --framework net5.0 --no-build --verbosity normal
+        dotnet test ./src/Tests/AutoInstrumentation.UnitTests --framework net6.0 --no-build --verbosity normal
+        dotnet test ./src/Tests/AutoInstrumentation.UnitTests --framework net7.0 --no-build --verbosity normal
+        dotnet test ./src/Tests/AutoInstrumentation.UnitTests --framework net8.0 --no-build --verbosity normal
+        dotnet test ./src/Tests/AutoInstrumentation.UnitTests --framework net9.0 --no-build --verbosity normal
