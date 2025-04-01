@@ -8,6 +8,7 @@ using OpenTelemetry.AutoInstrumentation.Digma.Utils;
 namespace AutoInstrumentation.IntegrationTests;
 
 [TestClass]
+[TestCategory("Integration")]
 public class UserCodeInstrumentationTests : BaseInstrumentationTest
 {
     [TestMethod]

@@ -12,6 +12,7 @@ using OpenTelemetry.AutoInstrumentation.Digma;
 namespace AutoInstrumentation.IntegrationTests;
 
 [TestClass]
+[TestCategory("Integration")]
 public class MssqlInstrumentationTest : BaseInstrumentationTest
 {
     private static MsSqlContainer _msSqlContainer;
