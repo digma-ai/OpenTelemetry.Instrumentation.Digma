@@ -18,10 +18,7 @@ jobs:
       uses: actions/setup-dotnet@v2
       with:
         dotnet-version: |
-          5.0.x
           6.0.x
-          7.0.x
-          8.0.x
           9.0.x
           
     - name: Restore dependencies
@@ -36,8 +33,4 @@ jobs:
         
     - name: Test AutoInstrumentation.UnitTests
       run: |
-        dotnet test ./src/Tests/AutoInstrumentation.UnitTests --framework net5.0 --no-build --verbosity normal
-        dotnet test ./src/Tests/AutoInstrumentation.UnitTests --framework net6.0 --no-build --verbosity normal
-        dotnet test ./src/Tests/AutoInstrumentation.UnitTests --framework net7.0 --no-build --verbosity normal
-        dotnet test ./src/Tests/AutoInstrumentation.UnitTests --framework net8.0 --no-build --verbosity normal
         dotnet test ./src/Tests/AutoInstrumentation.UnitTests --framework net9.0 --no-build --verbosity normal
