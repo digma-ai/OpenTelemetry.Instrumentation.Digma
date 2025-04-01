@@ -10,6 +10,7 @@ using Vertica.Data.VerticaClient;
 namespace AutoInstrumentation.IntegrationTests;
 
 [TestClass]
+[TestCategory("Integration")]
 public class VerticaInstrumentationTest : BaseInstrumentationTest
 {
     private static VerticaContainer _verticaContainer;

@@ -13,17 +13,24 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Setup .NET 6.0
+
+    - name: Setup .NET
       uses: actions/setup-dotnet@v2
       with:
-        dotnet-version: 6.0.x
-    - name: Setup .NET 9.0
-      uses: actions/setup-dotnet@v2
-      with:
-        dotnet-version: 9.0.x
+        dotnet-version: |
+          6.0.x
+          9.0.x
+          
     - name: Restore dependencies
       run: dotnet restore
+
     - name: Build
       run: dotnet build --no-restore
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
+
+    - name: Test OpenTelemetry.Instrumentation.Digma.Tests
+      run: |
+        dotnet test ./src/OpenTelemetry.Instrumentation.Digma.Tests --no-build --verbosity normal
+        
+    - name: Test AutoInstrumentation.UnitTests
+      run: |
+        dotnet test ./src/Tests/AutoInstrumentation.UnitTests --framework net9.0 --no-build --verbosity normal
