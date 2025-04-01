@@ -17,6 +17,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoInstrumentation.UnitTes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoInstrumentation.IntegrationTests", "src\Tests\AutoInstrumentation.IntegrationTests\AutoInstrumentation.IntegrationTests.csproj", "{E4E70C20-C27F-4B8A-AD67-AD6070D3E217}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoInstrumentation.WindowsServiceSampleApp", "src\Tests\AutoInstrumentation.WindowsServiceSampleApp\AutoInstrumentation.WindowsServiceSampleApp.csproj", "{A270DB1B-DACB-4C22-B8C7-79A247D574F4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoInstrumentation.ZeroCodeTests", "src\Tests\AutoInstrumentation.ZeroCodeTests\AutoInstrumentation.ZeroCodeTests.csproj", "{C05B4989-5E3A-43B9-8F6B-A7C3C13760E4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +51,14 @@ Global
 		{E4E70C20-C27F-4B8A-AD67-AD6070D3E217}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E4E70C20-C27F-4B8A-AD67-AD6070D3E217}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E4E70C20-C27F-4B8A-AD67-AD6070D3E217}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A270DB1B-DACB-4C22-B8C7-79A247D574F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A270DB1B-DACB-4C22-B8C7-79A247D574F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A270DB1B-DACB-4C22-B8C7-79A247D574F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A270DB1B-DACB-4C22-B8C7-79A247D574F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C05B4989-5E3A-43B9-8F6B-A7C3C13760E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C05B4989-5E3A-43B9-8F6B-A7C3C13760E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C05B4989-5E3A-43B9-8F6B-A7C3C13760E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C05B4989-5E3A-43B9-8F6B-A7C3C13760E4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -57,5 +69,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{5C3CC7F6-09C4-40D4-866C-6F7C0A7A0BC9} = {27F80A25-54CF-454F-857B-A0A5782D5A1C}
 		{E4E70C20-C27F-4B8A-AD67-AD6070D3E217} = {27F80A25-54CF-454F-857B-A0A5782D5A1C}
+		{A270DB1B-DACB-4C22-B8C7-79A247D574F4} = {27F80A25-54CF-454F-857B-A0A5782D5A1C}
+		{C05B4989-5E3A-43B9-8F6B-A7C3C13760E4} = {27F80A25-54CF-454F-857B-A0A5782D5A1C}
 	EndGlobalSection
 EndGlobal
