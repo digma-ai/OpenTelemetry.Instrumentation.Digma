@@ -1,4 +1,5 @@
-﻿using AutoInstrumentation.ZeroCodeTests.OsServices;
+﻿using System.Diagnostics;
+using AutoInstrumentation.ZeroCodeTests.OsServices;
 using AutoInstrumentation.ZeroCodeTests.OtelCollector;
 using FluentAssertions;
 using FluentAssertions.Extensions;
@@ -21,7 +22,9 @@ public class WindowsServiceTests
         Console.WriteLine(_serviceName);
         var exeFilePath = Path.GetFullPath(@"..\..\..\..\AutoInstrumentation.WindowsServiceSampleApp\bin\Debug\net9.0\AutoInstrumentation.WindowsServiceSampleApp.exe");
         _windowsServiceManager.CreateService(_serviceName, exeFilePath);
-        _windowsServiceManager.InstrumentService(_serviceName, OtelCollectorInitializer.Port, "grpc");
+        _windowsServiceManager.InstrumentService(_serviceName, 
+            $"http://localhost:{OtelCollectorInitializer.Port}/v1/traces/" , 
+            "http/protobuf");
     }
 
     [TestCleanup]
@@ -35,7 +38,25 @@ public class WindowsServiceTests
     public void Sanity()
     {
         _windowsServiceManager.IsServiceRunning(_serviceName).Should().BeTrue();
-        Thread.Sleep(10.Seconds());
-        OtelCollectorInitializer.ReceivedSpans.Should().NotBeEmpty();
+
+        var sw = Stopwatch.StartNew();
+        while (true)
+        {
+            try
+            {
+                Thread.Sleep(1.Seconds());
+                var spans = OtelCollectorInitializer.GetSpans(_serviceName)
+                    .Select(x => (Scope:x.Scope.Name, Span: x.Span.Name))
+                    .ToArray();
+                spans.Should().Contain((Scope:"UsersRepository", Span:"GetAllUsers"));
+                return;
+            }
+            catch
+            {
+                if (sw.Elapsed > 10.Seconds())
+                    throw;
+            }
+           
+        }
     }
 }
