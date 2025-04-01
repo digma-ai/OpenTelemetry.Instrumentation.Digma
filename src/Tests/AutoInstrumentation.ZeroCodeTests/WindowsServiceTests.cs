@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using AutoInstrumentation.ZeroCodeTests.OsServices;
 using AutoInstrumentation.ZeroCodeTests.OtelCollector;
+using AutoInstrumentation.ZeroCodeTests.Utils;
 using FluentAssertions;
 using FluentAssertions.Extensions;
 using Grpc.Net.Client;
@@ -39,24 +40,12 @@ public class WindowsServiceTests
     {
         _windowsServiceManager.IsServiceRunning(_serviceName).Should().BeTrue();
 
-        var sw = Stopwatch.StartNew();
-        while (true)
+        Retry.Do(() =>
         {
-            try
-            {
-                Thread.Sleep(1.Seconds());
-                var spans = OtelCollectorInitializer.GetSpans(_serviceName)
-                    .Select(x => (Scope:x.Scope.Name, Span: x.Span.Name))
-                    .ToArray();
-                spans.Should().Contain((Scope:"UsersRepository", Span:"GetAllUsers"));
-                return;
-            }
-            catch
-            {
-                if (sw.Elapsed > 10.Seconds())
-                    throw;
-            }
-           
-        }
+            var spans = OtelCollectorInitializer.GetSpans(_serviceName)
+                .Select(x => (Scope:x.Scope.Name, Span: x.Span.Name))
+                .ToArray();
+            spans.Should().Contain((Scope:"UsersRepository", Span:"GetAllUsers"));
+        });
     }
 }
