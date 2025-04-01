@@ -68,7 +68,7 @@ public sealed class ConfigurationProviderTest
     {
         var config = new Configuration
         {
-            Include = [new InstrumentationRule()]
+            Include = new[]{new InstrumentationRule()}
         };
         
         var isValid = ConfigurationProvider.Validate(config, out var errors);
@@ -83,7 +83,7 @@ public sealed class ConfigurationProviderTest
     {
         var config = new Configuration
         {
-            Include = [new InstrumentationRule{Namespaces = "/[/"}]
+            Include = new[]{new InstrumentationRule{Namespaces = "/[/"}}
         };
         
         var isValid = ConfigurationProvider.Validate(config, out var errors);
@@ -102,7 +102,7 @@ public sealed class ConfigurationProviderTest
     {
         var config = new Configuration
         {
-            Include = [new InstrumentationRule{Namespaces = "*", Classes = "/[/"}]
+            Include = new[]{new InstrumentationRule{Namespaces = "*", Classes = "/[/"}}
         };
         
         var isValid = ConfigurationProvider.Validate(config, out var errors);
@@ -121,7 +121,7 @@ public sealed class ConfigurationProviderTest
     {
         var config = new Configuration
         {
-            Include = [new InstrumentationRule{Namespaces = "*", Methods = "/[/"}]
+            Include = new[]{ new InstrumentationRule{Namespaces = "*", Methods = "/[/"}}
         };
         
         var isValid = ConfigurationProvider.Validate(config, out var errors);
@@ -141,10 +141,11 @@ public sealed class ConfigurationProviderTest
     {
         var config = new Configuration
         {
-            Include = [
+            Include = new[]{
                 new InstrumentationRule{Namespaces = "*", Classes = "/[/"},
                 new InstrumentationRule{Namespaces = "*"},
-                new InstrumentationRule{Namespaces = "*", Methods = "/[/"}]
+                new InstrumentationRule{Namespaces = "*", Methods = "/[/"}
+            }
         };
         
         var isValid = ConfigurationProvider.Validate(config, out var errors);
