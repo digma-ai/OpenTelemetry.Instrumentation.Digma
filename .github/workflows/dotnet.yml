@@ -31,13 +31,6 @@ jobs:
       run: |
         dotnet test ./src/OpenTelemetry.Instrumentation.Digma.Tests --no-build --verbosity normal
         
-    # - name: Test AutoInstrumentation.UnitTests
-    #   run: |
-    #     dotnet test ./src/Tests/AutoInstrumentation.UnitTests --framework net9.0 --no-build --verbosity normal
-
     - name: Test AutoInstrumentation.UnitTests
       run: |
-        dotnet test ./src/Tests/AutoInstrumentation.UnitTests --framework net9.0 --no-build --logger "trx;LogFileName=test_results.trx"
-        dotnet tool install -g trx2gh --add-source https://f2calv.pkgs.visualstudio.com/_packaging/trx2gh/nuget/v3/index.json
-        echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
-        trx2gh test_results.trx
+        dotnet test ./src/Tests/AutoInstrumentation.UnitTests --framework net9.0 --no-build --verbosity normal
