@@ -20,11 +20,11 @@ public class VerticaInstrumentation
 
     private readonly Harmony _harmony;
 
-    private readonly string[] TargetMethodNames =
+    private readonly Func<MethodBase, bool>[] TargetMethodPredicates =
     {
-        "ExecuteReader",
-        "ExecuteScalar",
-        "ExecuteNonQuery",
+        m => m.Name == "ExecuteReader" && m.GetParameters().Any(p => p.ParameterType.Name == "CommandBehavior"),
+        m => m.Name == "ExecuteScalar",
+        m => m.Name == "ExecuteNonQuery",
     };
 
     public VerticaInstrumentation(Harmony harmony)
@@ -36,13 +36,6 @@ public class VerticaInstrumentation
     {
         try
         {
-            var verticaCommandType = verticaDataAssembly.GetType("Vertica.Data.VerticaClient.VerticaCommand", throwOnError: false);
-            if (verticaCommandType == null)
-            {
-                Logger.LogError("Vertica.Data.VerticaClient.VerticaCommand not found.");
-                return;
-            }
-            
             var sCommandType = verticaDataAssembly.GetType("Vertica.Data.Internal.ADO.Net.SCommand", throwOnError: false);
             if (sCommandType == null)
             {
@@ -78,9 +71,9 @@ public class VerticaInstrumentation
                 return;
             }
             
-            var methodInfos = verticaCommandType.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-                .Where(x => TargetMethodNames.Contains(x.Name))
-                .Where(x => x.DeclaringType == verticaCommandType)
+            var methodInfos = sCommandType.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                .Where(x => TargetMethodPredicates.Any(p => p(x)))
+                .Where(x => x.DeclaringType == sCommandType)
                 .ToArray();
             foreach (var methodInfo in methodInfos)
             {

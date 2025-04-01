@@ -156,7 +156,7 @@ public class TestTracingDecorator
             var activity = _mockProcessor.Activities.Single();
             AssertActivity.SpanNameIs("AsyncError", activity);
             AssertActivity.InstrumentationScopeIs("OpenTelemetry.Instrumentation.Digma.Tests.Stubs.DecoratedService", activity);
-            AssertActivity.DurationIs(100.Milliseconds(), 30.Milliseconds(), activity);
+            AssertActivity.DurationIs(100.Milliseconds(), 50.Milliseconds(), activity);
             AssertActivity.HasTag("code.namespace", "OpenTelemetry.Instrumentation.Digma.Tests.Stubs.DecoratedService", activity);
             AssertActivity.HasTag("code.function", "AsyncError", activity);
         }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
 using HarmonyLib;
 using OpenTelemetry.AutoInstrumentation.Digma.Utils;
@@ -14,40 +13,32 @@ public class UserCodeInstrumentation
     private static readonly MethodInfo FinalizerMethodInfo = typeof(UserCodeInstrumentation).GetMethod(nameof(Finalizer), BindingFlags.Static | BindingFlags.NonPublic);
 
     private readonly Harmony _harmony;
-    private readonly string[] _namespaces;
-    private readonly bool _includePrivateMethods;
+    private readonly Configuration _configuration;
 
-    public UserCodeInstrumentation(Harmony harmony)
+    public UserCodeInstrumentation(Harmony harmony, Configuration configuration = null)
     {
         _harmony = harmony;
-        var namespacesStr = Environment.GetEnvironmentVariable("OTEL_DOTNET_AUTO_NAMESPACES");
-        _namespaces = namespacesStr?.Split(',')
-                          .Select(x => x.Trim())
-                          .Where(x => !string.IsNullOrWhiteSpace(x))
-                          .ToArray()
-                      ?? Array.Empty<string>();
-        _includePrivateMethods = Environment.GetEnvironmentVariable("OTEL_DOTNET_AUTO_INCLUDE_PRIVATE_METHODS")
-            ?.Equals("true", StringComparison.InvariantCultureIgnoreCase) == true;
-        
-        Logger.LogInfo($"Requested to auto-instrument {_namespaces.Length} namespaces:\n"+
-                       string.Join("\n", _namespaces));
+        _configuration = configuration ?? ConfigurationProvider.GetConfiguration();
+
+        Logger.LogInfo("Configuration:\n" + _configuration.ToJson());
     }
     
     public void Instrument(Assembly assembly)
     {
-        var name = assembly.GetName().Name;
-        if (ShouldInstrumentAssembly(name))
+        MethodInfo[] methods;
+        try
         {
-            var relevantTypes = assembly.GetTypes().Where(ShouldInstrumentType).ToArray();
-            var methods = relevantTypes
-                .SelectMany(t => t
-                    .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                    .Where(m => ShouldInstrumentMethod(t,m)))
-                .ToArray();
-            foreach (var method in methods)
-            {
-                PatchMethod(method);
-            }
+            methods = MethodDiscovery.GetMethodsToPatch(assembly, _configuration);
+        }
+        catch (Exception e)
+        {
+            Logger.LogError($"Failed to discover methods to instrument in '{assembly.FullName}'", e);
+            return;
+        }
+
+        foreach (var method in methods)
+        {
+            PatchMethod(method);
         }
     }
     
@@ -69,44 +60,9 @@ public class UserCodeInstrumentation
         {
             Logger.LogError($"Failed to patch {methodFullName}", e);
         }
-
-    }
-    
-    private bool ShouldInstrumentAssembly(string assemblyName)
-    {
-        return _namespaces.Any(ns => ns.StartsWith(assemblyName, StringComparison.OrdinalIgnoreCase) ||
-                                     assemblyName.StartsWith(ns, StringComparison.OrdinalIgnoreCase));
     }
 
-    private bool ShouldInstrumentType(Type type)
-    {
-        return !typeof(Delegate).IsAssignableFrom(type) &&
-               !type.IsGenericType &&
-               _namespaces.Any(ns => type.FullName?.StartsWith(ns, StringComparison.OrdinalIgnoreCase) == true);
-    }
-
-    private bool ShouldInstrumentMethod(Type type, MethodInfo methodInfo)
-    {
-        return methodInfo.DeclaringType == type &&
-               !methodInfo.IsAbstract &&
-               !methodInfo.IsSpecialName && // property accessors and operator overloading methods
-               !methodInfo.IsGenericMethod &&
-               methodInfo.Name != "GetHashCode" && 
-               methodInfo.Name != "Equals" && 
-               methodInfo.Name != "ToString" && 
-               methodInfo.Name != "Deconstruct" &&
-               methodInfo.Name != "MoveNext" &&
-               methodInfo.Name != "SetStateMachine" &&
-               methodInfo.Name != "PrintMembers" &&
-               methodInfo.Name != "Dispose" &&
-               methodInfo.Name != "BuildKey" &&
-               methodInfo.Name != "IsEmpty" &&
-               methodInfo.Name != "GetResultByIndex" &&
-               methodInfo.Name != "<Clone>$" &&
-               (methodInfo.IsPublic || _includePrivateMethods);
-    }
-
-    private bool DoesAlreadyStartActivity(MethodInfo methodInfo)
+    private static bool DoesAlreadyStartActivity(MethodInfo methodInfo)
     {
         var instructions = PatchProcessor.GetOriginalInstructions(methodInfo);
         foreach (var instruction in instructions)
@@ -142,6 +98,10 @@ public class UserCodeInstrumentation
         {
             activity.RecordException(__exception);
             activity.SetStatus(ActivityStatusCode.Error);
+        }
+        else
+        {
+            activity.SetStatus(ActivityStatusCode.Ok);
         }            
         activity.Dispose();
         Logger.LogDebug($"Closed Activity: {activity.Source.Name}.{activity.OperationName}");

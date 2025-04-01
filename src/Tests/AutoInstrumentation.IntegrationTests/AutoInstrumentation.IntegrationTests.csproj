@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>net47;net5.0;net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
+        <LangVersion>10</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsPackable>false</IsPackable>
+        <IsTestProject>true</IsTestProject>
+        <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="FluentAssertions" Version="6.0.0" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0"/>
+        <PackageReference Include="MSTest" Version="3.6.4"/>
+        <PackageReference Include="Dapper" Version="2.1.66" />
+        <PackageReference Include="OpenTelemetry" Version="1.11.2" />
+        <PackageReference Include="OpenTelemetry.Instrumentation.SqlClient" Version="1.11.0-beta.2" />
+        <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="9.0.0" />
+        <PackageReference Include="Testcontainers.MsSql" Version="4.3.0" />
+        <PackageReference Include="Vertica.Data" Version="24.3.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting"/>
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(TargetFramework)' == 'net47'">
+        <PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\OpenTelemetry.AutoInstrumentation.Digma\OpenTelemetry.AutoInstrumentation.Digma.csproj" />
+    </ItemGroup>
+    
+</Project>
