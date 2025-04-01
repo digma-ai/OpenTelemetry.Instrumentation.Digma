@@ -31,6 +31,16 @@ jobs:
       run: |
         dotnet test ./src/OpenTelemetry.Instrumentation.Digma.Tests --no-build --verbosity normal
         
+    # - name: Test AutoInstrumentation.UnitTests
+    #   run: |
+    #     dotnet test ./src/Tests/AutoInstrumentation.UnitTests --framework net9.0 --no-build --verbosity normal
+
     - name: Test AutoInstrumentation.UnitTests
       run: |
-        dotnet test ./src/Tests/AutoInstrumentation.UnitTests --framework net9.0 --no-build --verbosity normal
+        dotnet test ./src/Tests/AutoInstrumentation.UnitTests --framework net9.0 --no-build --logger "trx;LogFileName=test_results.trx"
+        dotnet tool install -g trx2junit
+        trx2junit test_results.trx
+    - name: Publish test results to summary
+      uses: test-summary/action@v2
+      with:
+        paths: "TEST-*.xml"
