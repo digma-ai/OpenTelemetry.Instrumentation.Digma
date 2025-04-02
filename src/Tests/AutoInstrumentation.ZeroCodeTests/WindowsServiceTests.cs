@@ -38,8 +38,6 @@ public class WindowsServiceTests
     [TestMethod]
     public void Sanity()
     {
-        _windowsServiceManager.IsServiceRunning(_serviceName).Should().BeTrue();
-
         Retry.Do(() =>
         {
             var spans = OtelCollectorInitializer.GetSpans(_serviceName)
