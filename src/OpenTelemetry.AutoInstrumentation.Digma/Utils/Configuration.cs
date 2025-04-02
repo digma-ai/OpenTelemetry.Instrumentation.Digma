@@ -20,6 +20,7 @@ public class InstrumentationRule
     public string Namespaces { get; set; }
     public string Classes { get; set; }
     public string Methods { get; set; }
+    public bool NestedOnly { get; set; }
     
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public MethodSyncModifier? SyncModifier { get; set; }

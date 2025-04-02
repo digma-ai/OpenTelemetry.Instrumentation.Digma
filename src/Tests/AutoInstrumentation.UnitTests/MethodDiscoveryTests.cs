@@ -22,17 +22,17 @@ namespace AutoInstrumentation.UnitTests
         {
             var configuration = new Configuration
             {
-                Include =
-                [
+                Include =new[]
+                {
                     new InstrumentationRule
                     {
                         Namespaces = "AutoInstrumentation.UnitTests.TypesTo*"
                     }
-                ]
+                }
             };
             var methods = MethodDiscovery.GetMethodsToPatch(ThisAssembly, configuration);
-            methods.Should().Contain(x => x.DeclaringType == typeof(Record));
-            methods.Should().Contain(x => x.DeclaringType == typeof(Class));
+            methods.Should().Contain(x => x.MethodInfo.DeclaringType == typeof(Record));
+            methods.Should().Contain(x => x.MethodInfo.DeclaringType == typeof(Class));
         }
         
         [TestMethod]
@@ -40,17 +40,17 @@ namespace AutoInstrumentation.UnitTests
         {
             var configuration = new Configuration
             {
-                Include =
-                [
+                Include =new[]
+                {
                     new InstrumentationRule
                     {
                         Namespaces = "/^AutoInstrumentation.*TypesToTest/"
                     }
-                ]
+                }
             };
             var methods = MethodDiscovery.GetMethodsToPatch(ThisAssembly, configuration);
-            methods.Should().Contain(x => x.DeclaringType == typeof(Record));
-            methods.Should().Contain(x => x.DeclaringType == typeof(Class));
+            methods.Should().Contain(x => x.MethodInfo.DeclaringType == typeof(Record));
+            methods.Should().Contain(x => x.MethodInfo.DeclaringType == typeof(Class));
         }
         
         [TestMethod]
@@ -58,18 +58,18 @@ namespace AutoInstrumentation.UnitTests
         {
             var configuration = new Configuration
             {
-                Include =
-                [
+                Include =new[]
+                {
                     new InstrumentationRule
                     {
                         Namespaces = "AutoInstrumentation.UnitTests.TypesTo*",
                         Classes = "Rec*"
                     }
-                ]
+                }
             };
             var methods = MethodDiscovery.GetMethodsToPatch(ThisAssembly, configuration);
-            methods.Should().Contain(x => x.DeclaringType == typeof(Record));
-            methods.Should().NotContain(x => x.DeclaringType == typeof(Class));
+            methods.Should().Contain(x => x.MethodInfo.DeclaringType == typeof(Record));
+            methods.Should().NotContain(x => x.MethodInfo.DeclaringType == typeof(Class));
         }
         
         [TestMethod]
@@ -77,18 +77,18 @@ namespace AutoInstrumentation.UnitTests
         {
             var configuration = new Configuration
             {
-                Include =
-                [
+                Include =new[]
+                {
                     new InstrumentationRule
                     {
                         Namespaces = "AutoInstrumentation.UnitTests.TypesTo*",
                         Classes = "/Rec.*/"
                     }
-                ]
+                }
             };
             var methods = MethodDiscovery.GetMethodsToPatch(ThisAssembly, configuration);
-            methods.Should().Contain(x => x.DeclaringType == typeof(Record));
-            methods.Should().NotContain(x => x.DeclaringType == typeof(Class));
+            methods.Should().Contain(x => x.MethodInfo.DeclaringType == typeof(Record));
+            methods.Should().NotContain(x => x.MethodInfo.DeclaringType == typeof(Class));
         }
         
         [TestMethod]
@@ -96,20 +96,20 @@ namespace AutoInstrumentation.UnitTests
         {
             var configuration = new Configuration
             {
-                Include =
-                [
+                Include =new[]
+                {
                     new InstrumentationRule
                     {
                         Namespaces = "AutoInstrumentation.UnitTests.TypesTo*",
                         Classes = "Rec*",
                         Methods = "Private*"
                     }
-                ]
+                }
             };
             var methods = MethodDiscovery.GetMethodsToPatch(ThisAssembly, configuration);
             methods.Should().Satisfy(
-                x => x.DeclaringType == typeof(Record) && x.Name == "PrivateMethod",
-                x => x.DeclaringType == typeof(Record) && x.Name == "PrivateMethodAsync");
+                x => x.MethodInfo.DeclaringType == typeof(Record) && x.MethodInfo.Name == "PrivateMethod",
+                x => x.MethodInfo.DeclaringType == typeof(Record) && x.MethodInfo.Name == "PrivateMethodAsync");
         }    
         
         [TestMethod]
@@ -117,20 +117,20 @@ namespace AutoInstrumentation.UnitTests
         {
             var configuration = new Configuration
             {
-                Include =
-                [
+                Include =new[]
+                {
                     new InstrumentationRule
                     {
                         Namespaces = "AutoInstrumentation.UnitTests.TypesTo*",
                         Classes = "Rec*",
                         Methods = "/Private.*/"
                     }
-                ]
+                }
             };
             var methods = MethodDiscovery.GetMethodsToPatch(ThisAssembly, configuration);
             methods.Should().Satisfy(
-                x => x.DeclaringType == typeof(Record) && x.Name == "PrivateMethod",
-                x => x.DeclaringType == typeof(Record) && x.Name == "PrivateMethodAsync");
+                x => x.MethodInfo.DeclaringType == typeof(Record) && x.MethodInfo.Name == "PrivateMethod",
+                x => x.MethodInfo.DeclaringType == typeof(Record) && x.MethodInfo.Name == "PrivateMethodAsync");
         }
         
         [TestMethod]
@@ -138,21 +138,21 @@ namespace AutoInstrumentation.UnitTests
         {
             var configuration = new Configuration
             {
-                Include =
-                [
+                Include = new[]
+                {
                     new InstrumentationRule
                     {
                         Namespaces = "AutoInstrumentation.UnitTests.TypesTo*",
                         AccessModifier = MethodAccessModifier.Public
                     }
-                ]
+                }
             };
             var methods = MethodDiscovery.GetMethodsToPatch(ThisAssembly, configuration);
             methods.Should().Satisfy(
-                x => x.DeclaringType == typeof(Record) && x.Name == "PublicMethod",
-                x => x.DeclaringType == typeof(Record) && x.Name == "PublicMethodAsync",
-                x => x.DeclaringType == typeof(Class) && x.Name == "PublicMethod",
-                x => x.DeclaringType == typeof(Class) && x.Name == "PublicMethodAsync");
+                x => x.MethodInfo.DeclaringType == typeof(Record) && x.MethodInfo.Name == "PublicMethod",
+                x => x.MethodInfo.DeclaringType == typeof(Record) && x.MethodInfo.Name == "PublicMethodAsync",
+                x => x.MethodInfo.DeclaringType == typeof(Class) && x.MethodInfo.Name == "PublicMethod",
+                x => x.MethodInfo.DeclaringType == typeof(Class) && x.MethodInfo.Name == "PublicMethodAsync");
         }     
         
         [TestMethod]
@@ -160,21 +160,21 @@ namespace AutoInstrumentation.UnitTests
         {
             var configuration = new Configuration
             {
-                Include =
-                [
+                Include =new[]
+                {
                     new InstrumentationRule
                     {
                         Namespaces = "AutoInstrumentation.UnitTests.TypesTo*",
                         AccessModifier = MethodAccessModifier.Private
                     }
-                ]
+                }
             };
             var methods = MethodDiscovery.GetMethodsToPatch(ThisAssembly, configuration);
             methods.Should().Satisfy(
-                x => x.DeclaringType == typeof(Record) && x.Name == "PrivateMethod",
-                x => x.DeclaringType == typeof(Record) && x.Name == "PrivateMethodAsync",
-                x => x.DeclaringType == typeof(Class) && x.Name == "PrivateMethod",
-                x => x.DeclaringType == typeof(Class) && x.Name == "PrivateMethodAsync");
+                x => x.MethodInfo.DeclaringType == typeof(Record) && x.MethodInfo.Name == "PrivateMethod",
+                x => x.MethodInfo.DeclaringType == typeof(Record) && x.MethodInfo.Name == "PrivateMethodAsync",
+                x => x.MethodInfo.DeclaringType == typeof(Class) && x.MethodInfo.Name == "PrivateMethod",
+                x => x.MethodInfo.DeclaringType == typeof(Class) && x.MethodInfo.Name == "PrivateMethodAsync");
         }    
         
         [TestMethod]
@@ -182,21 +182,21 @@ namespace AutoInstrumentation.UnitTests
         {
             var configuration = new Configuration
             {
-                Include =
-                [
+                Include =new[]
+                {
                     new InstrumentationRule
                     {
                         Namespaces = "AutoInstrumentation.UnitTests.TypesTo*",
                         SyncModifier = MethodSyncModifier.Sync
                     }
-                ]
+                }
             };
             var methods = MethodDiscovery.GetMethodsToPatch(ThisAssembly, configuration);
             methods.Should().Satisfy(
-                x => x.DeclaringType == typeof(Record) && x.Name == "PrivateMethod",
-                x => x.DeclaringType == typeof(Record) && x.Name == "PublicMethod",
-                x => x.DeclaringType == typeof(Class) && x.Name == "PrivateMethod",
-                x => x.DeclaringType == typeof(Class) && x.Name == "PublicMethod");
+                x => x.MethodInfo.DeclaringType == typeof(Record) && x.MethodInfo.Name == "PrivateMethod",
+                x => x.MethodInfo.DeclaringType == typeof(Record) && x.MethodInfo.Name == "PublicMethod",
+                x => x.MethodInfo.DeclaringType == typeof(Class) && x.MethodInfo.Name == "PrivateMethod",
+                x => x.MethodInfo.DeclaringType == typeof(Class) && x.MethodInfo.Name == "PublicMethod");
         }
 
         [TestMethod]
@@ -204,27 +204,27 @@ namespace AutoInstrumentation.UnitTests
         {
             var configuration = new Configuration
             {
-                Include =
-                [
+                Include = new[]
+                {
                     new InstrumentationRule
                     {
                         Namespaces = "AutoInstrumentation.UnitTests.TypesTo*",
                         SyncModifier = MethodSyncModifier.Sync
                     }
-                ],
-                Exclude = 
-                [
+                },
+                Exclude = new[]
+                {
                     new InstrumentationRule
                     {
                         Namespaces = "AutoInstrumentation.UnitTests.TypesTo*",
                         AccessModifier = MethodAccessModifier.Private
                     }
-                ],
+                }
             };
             var methods = MethodDiscovery.GetMethodsToPatch(ThisAssembly, configuration);
             methods.Should().Satisfy(
-                x => x.DeclaringType == typeof(Record) && x.Name == "PublicMethod",
-                x => x.DeclaringType == typeof(Class) && x.Name == "PublicMethod");
+                x => x.MethodInfo.DeclaringType == typeof(Record) && x.MethodInfo.Name == "PublicMethod",
+                x => x.MethodInfo.DeclaringType == typeof(Class) && x.MethodInfo.Name == "PublicMethod");
         }
     }
 }
