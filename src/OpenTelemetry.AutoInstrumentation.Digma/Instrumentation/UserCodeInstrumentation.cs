@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using HarmonyLib;
 using OpenTelemetry.AutoInstrumentation.Digma.Utils;
@@ -10,6 +11,7 @@ public class UserCodeInstrumentation
 {
     private static readonly ActivitySourceProvider ActivitySourceProvider = new();
     private static readonly MethodInfo PrefixMethodInfo = typeof(UserCodeInstrumentation).GetMethod(nameof(Prefix), BindingFlags.Static | BindingFlags.NonPublic);
+    private static readonly MethodInfo PrefixForInternalSpanMethodInfo = typeof(UserCodeInstrumentation).GetMethod(nameof(PrefixForInternalSpan), BindingFlags.Static | BindingFlags.NonPublic);
     private static readonly MethodInfo FinalizerMethodInfo = typeof(UserCodeInstrumentation).GetMethod(nameof(Finalizer), BindingFlags.Static | BindingFlags.NonPublic);
 
     private readonly Harmony _harmony;
@@ -25,7 +27,7 @@ public class UserCodeInstrumentation
     
     public void Instrument(Assembly assembly)
     {
-        MethodInfo[] methods;
+        MethodDiscovery.ApplicableMethod[] methods;
         try
         {
             methods = MethodDiscovery.GetMethodsToPatch(assembly, _configuration);
@@ -42,14 +44,19 @@ public class UserCodeInstrumentation
         }
     }
     
-    private void PatchMethod(MethodInfo originalMethodInfo)
+    private void PatchMethod(MethodDiscovery.ApplicableMethod method)
     {
+        var originalMethodInfo = method.MethodInfo;
         var methodFullName = $"{originalMethodInfo.DeclaringType?.FullName}.{originalMethodInfo.Name}";
         try
         {
-            var prefix = DoesAlreadyStartActivity(originalMethodInfo)
-                ? null
-                : new HarmonyMethod(PrefixMethodInfo);
+            HarmonyMethod prefix = null; //PrefixForInternalSpanMethodInfo
+            if (!DoesAlreadyStartActivity(originalMethodInfo))
+            {
+                prefix = new HarmonyMethod(method.MatchingRules.Any(r => r.NestedOnly)
+                    ? PrefixForInternalSpanMethodInfo
+                    : PrefixMethodInfo);
+            }
 
             var finalizer = new HarmonyMethod(FinalizerMethodInfo);
 
@@ -76,6 +83,12 @@ public class UserCodeInstrumentation
         }
 
         return false;
+    }
+
+    private static void PrefixForInternalSpan(MethodBase __originalMethod, out Activity __state)
+    {
+        Prefix(__originalMethod, out __state);
+        __state?.SetTag(DigmaSemanticConventions.NestedOnly, true);
     }
 
     private static void Prefix(MethodBase __originalMethod, out Activity __state)

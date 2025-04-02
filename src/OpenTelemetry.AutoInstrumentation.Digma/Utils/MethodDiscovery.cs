@@ -9,9 +9,15 @@ namespace OpenTelemetry.AutoInstrumentation.Digma.Utils;
 
 public static class MethodDiscovery
 {
-    public static MethodInfo[] GetMethodsToPatch(Assembly assembly, Configuration configuration)
+    public class ApplicableMethod
     {
-        var methodsToPatch = new List<MethodInfo>();
+        public MethodInfo MethodInfo { get; set; }
+        public InstrumentationRule[] MatchingRules { get; set; }
+    }
+    
+    public static ApplicableMethod[] GetMethodsToPatch(Assembly assembly, Configuration configuration)
+    {
+        var methodsToPatch = new List<ApplicableMethod>();
         
         foreach (var type in assembly.GetTypes().Where(CanInstrumentType))
         {
@@ -35,7 +41,11 @@ public static class MethodDiscovery
                 if(!methodIncludeRules.Any() || methodExcludeRules.Any())
                     continue;
                 
-                methodsToPatch.Add(method);
+                methodsToPatch.Add(new ApplicableMethod
+                {
+                    MethodInfo = method,
+                    MatchingRules = methodIncludeRules
+                });
             }
         }
 

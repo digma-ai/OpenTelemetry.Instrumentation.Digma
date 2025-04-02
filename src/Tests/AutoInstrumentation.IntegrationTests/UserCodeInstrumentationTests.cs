@@ -36,11 +36,35 @@ public class UserCodeInstrumentationTests : BaseInstrumentationTest
         Activities[0].Kind.Should().Be(ActivityKind.Internal);
         Activities[0].Status.Should().Be(ActivityStatusCode.Ok);
         Activities[0].Duration.Should().BeCloseTo(100.Milliseconds(), 20.Milliseconds());
-        Activities[0].Tags.Should().Contain(
-            new KeyValuePair<string, string?>("digma.instrumentation.extended.package", "AutoInstrumentation.IntegrationTests"),
-            new KeyValuePair<string, string?>("code.namespace", "AutoInstrumentation.IntegrationTests.UserCodeInstrumentationTests"),
-            new KeyValuePair<string, string?>("code.function", "MyMethod")
+        Activities[0].TagObjects.Should().Contain(
+            new KeyValuePair<string, object?>("digma.instrumentation.extended.package", "AutoInstrumentation.IntegrationTests"),
+            new KeyValuePair<string, object?>("code.namespace", "AutoInstrumentation.IntegrationTests.UserCodeInstrumentationTests"),
+            new KeyValuePair<string, object?>("code.function", "MyMethod")
         );
+    }
+        
+    [TestMethod]
+    public void NestedOnly()
+    {
+        var configuration = new Configuration
+        {
+            Include = new[]
+            {
+                new InstrumentationRule
+                {
+                    Namespaces = "AutoInstrumentation*",
+                    Methods = "MyMethod",
+                    NestedOnly = true
+                }
+            }
+        };
+        
+        using var instrument = new AutoInstrumentor(configuration).Instrument();
+
+        MyMethod();
+        
+        Activities.Should().HaveCount(1);
+        Activities[0].TagObjects.Should().Contain(new KeyValuePair<string, object?>("digma.nestedOnly", true));
     }
     
     [TestMethod]
