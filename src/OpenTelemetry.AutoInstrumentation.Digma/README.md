@@ -36,6 +36,7 @@ This JSON file defines include and exclude rules to control which code elements 
 
 Each object in the include array supports the following optional fields:
 | Field | Type | Description |
+| -------- | ------- | ------- |
 | namespaces | string | Namespace pattern to match. Wildcards (*) and regex (/^.../) supported. |
 | classes | string |  Class name pattern. Wildcards or regex (/^.../) are supported. |
 | methods | string | Method name pattern. Wildcards or regex (/^.../) are supported. |
@@ -48,6 +49,7 @@ If multiple fields are specified, all must match for the rule to apply.
 #### Wildcards vs Regex
 
 | Pattern Type | Syntax | Example | Description | 
+| -------- | ------- | ------- | ------- | 
 | Wildcard | "Acme.*" | Matches any sub-namespace under Digma |
 | Regex | "/^Acme\\.V\\d+/" | Matches namespaces like Acme.V1, Acme.V2, etc.
 
