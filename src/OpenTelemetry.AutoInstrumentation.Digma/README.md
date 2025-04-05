@@ -50,8 +50,8 @@ If multiple fields are specified, all must match for the rule to apply.
 
 | Pattern Type | Syntax | Example | Description | 
 | -------- | ------- | ------- | ------- | 
-| Wildcard | "Acme.*" | Matches any sub-namespace under Digma |
-| Regex | "/^Acme\\.V\\d+/" | Matches namespaces like Acme.V1, Acme.V2, etc.
+| Wildcard | "Acme.*" | Matches to the specified namespace, you can use wildcards at any location in the namespace string  |
+| Regex | "/^Acme\\.V\\d+/" | String bound with two forward-slash characters will be considered regex expressions and will be matched accordingly |
 
 #### 🧪 Example
 
