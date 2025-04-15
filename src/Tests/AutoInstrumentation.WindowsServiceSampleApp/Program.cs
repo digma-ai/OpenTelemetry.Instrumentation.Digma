@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
 using AutoInstrumentation.WindowsServiceSampleApp;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Serilog;
 
 
@@ -18,18 +18,29 @@ Log.Logger = new LoggerConfiguration()
 try
 {
     Log.Information("Creating Host");
-    var host = Host.CreateDefaultBuilder(args)
-        .ConfigureServices(s =>
-        {
-            s.AddSingleton<IUsersRepository, UsersRepository>();
-            s.AddHostedService<Worker>();
-        })
-        .UseWindowsService()
-        .UseSystemd()
-        .Build();
+    
+    var builder = WebApplication.CreateBuilder(args);
+    
+    builder.Host.UseSerilog();
+    builder.Services.AddControllers();
+    if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("SERVICE_NAME")))
+    {
+        builder.Host.UseWindowsService();
+        builder.Host.UseSystemd(); 
+    }
+    builder.Services.AddSingleton<IUsersRepository, UsersRepository>();
+    builder.Services.AddHostedService<Worker>();
+    
+    var app = builder.Build();
 
+    if (app.Environment.IsDevelopment())
+        app.UseDeveloperExceptionPage();
+    
+    app.UseRouting();
+    app.MapControllers();
+    
     Log.Information("Running Host");
-    host.Run();
+    app.Run();
     Log.Information("Exited");
 }
 catch (Exception e)
