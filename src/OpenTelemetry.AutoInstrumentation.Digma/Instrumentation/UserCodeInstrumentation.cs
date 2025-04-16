@@ -110,11 +110,11 @@ public class UserCodeInstrumentation
         if (__exception != null)
         {
             activity.RecordException(__exception);
-            activity.SetStatus(ActivityStatusCode.Error);
+            activity.SetErrorStatus();
         }
         else
         {
-            activity.SetStatus(ActivityStatusCode.Ok);
+            activity.SetOkStatus();
         }            
         activity.Dispose();
         Logger.LogDebug($"Closed Activity: {activity.Source.Name}.{activity.OperationName}");

@@ -3,7 +3,7 @@
     <PropertyGroup>
         <IsPackable>true</IsPackable>
         <TargetFrameworks>net47;net5.0;net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
-        <LangVersion>10</LangVersion>
+        <LangVersion>latest</LangVersion>
         <PackageId>OpenTel.AutoInstrumentation.Digma</PackageId>
         <RootNamespace>OpenTelemetry.AutoInstrumentation.Digma</RootNamespace>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
@@ -19,13 +19,17 @@
 
     <ItemGroup>
       <PackageReference Include="Lib.Harmony" Version="2.3.5" />
-      <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="9.0.0" PrivateAssets="all" />
-      <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.0" />
-      <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
-      <PackageReference Include="Microsoft.AspNetCore.Routing.Abstractions" Version="2.2.0" />
     </ItemGroup>
     
     <ItemGroup Condition="'$(TargetFramework)' == 'net47'">
         <PackageReference Include="System.Text.Json" Version="9.0.0" />
+        <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="9.0.0" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="[2.2.0,)"  PrivateAssets="all"/>
+        <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="[2.2.0,)"  PrivateAssets="all"/>
+        <PackageReference Include="Microsoft.AspNetCore.Routing.Abstractions" Version="[2.2.0,)"  PrivateAssets="all"/>
+    </ItemGroup>
+    
+    <ItemGroup Condition="'$(TargetFramework)' != 'net47'">
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
 </Project>
