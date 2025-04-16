@@ -1,6 +1,8 @@
 ﻿using System.Reflection;
+using System.Runtime.InteropServices;
 using AutoInstrumentation.WindowsServiceSampleApp;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -18,27 +20,29 @@ Log.Logger = new LoggerConfiguration()
 try
 {
     Log.Information("Creating Host");
-    
-    var builder = WebApplication.CreateBuilder(args);
-    
-    builder.Host.UseSerilog();
-    builder.Services.AddControllers();
+
+    var builder = Host.CreateDefaultBuilder(args);
+        
     if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("SERVICE_NAME")))
     {
-        builder.Host.UseWindowsService();
-        builder.Host.UseSystemd(); 
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            builder = builder.UseWindowsService();
+        }
+        // else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        // {
+        //     builder = builder.UseSystemd();
+        // }
     }
-    builder.Services.AddSingleton<IUsersRepository, UsersRepository>();
-    builder.Services.AddHostedService<Worker>();
     
-    var app = builder.Build();
-
-    if (app.Environment.IsDevelopment())
-        app.UseDeveloperExceptionPage();
-    
-    app.UseRouting();
-    app.MapControllers();
-    
+    var app = builder
+        .UseSerilog()
+        .ConfigureWebHostDefaults(webBuilder =>
+        {
+            webBuilder.UseStartup<Startup>();
+        })
+        .Build();
+  
     Log.Information("Running Host");
     app.Run();
     Log.Information("Exited");

@@ -7,9 +7,11 @@ interface IUsersRepository
 
 class UsersRepository : IUsersRepository
 {
+    private static readonly Random _random = new();
+    
     public string[] GetAllUsers()
     {
-        Thread.Sleep(Random.Shared.Next(100,200));
+        Thread.Sleep(_random.Next(100,200));
         return new[]{"ed", "edd", "eddy"};
     }
 }
