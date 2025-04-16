@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoInstrumentation.ZeroCod
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoInstrumentation.ConsoleAppNetFramework", "src\Tests\AutoInstrumentation.ConsoleAppNetFramework\AutoInstrumentation.ConsoleAppNetFramework.csproj", "{84B7BFC2-45D7-4D11-96F0-68FAC4062883}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoInstrumentation.ConsoleAppDotNet", "src\Tests\AutoInstrumentation.ConsoleAppDotNet\AutoInstrumentation.ConsoleAppDotNet.csproj", "{D112681B-6B71-4556-A138-6F68BC0A1AB1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -65,6 +67,10 @@ Global
 		{84B7BFC2-45D7-4D11-96F0-68FAC4062883}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{84B7BFC2-45D7-4D11-96F0-68FAC4062883}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{84B7BFC2-45D7-4D11-96F0-68FAC4062883}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D112681B-6B71-4556-A138-6F68BC0A1AB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D112681B-6B71-4556-A138-6F68BC0A1AB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D112681B-6B71-4556-A138-6F68BC0A1AB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D112681B-6B71-4556-A138-6F68BC0A1AB1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -78,5 +84,6 @@ Global
 		{A270DB1B-DACB-4C22-B8C7-79A247D574F4} = {27F80A25-54CF-454F-857B-A0A5782D5A1C}
 		{C05B4989-5E3A-43B9-8F6B-A7C3C13760E4} = {27F80A25-54CF-454F-857B-A0A5782D5A1C}
 		{84B7BFC2-45D7-4D11-96F0-68FAC4062883} = {27F80A25-54CF-454F-857B-A0A5782D5A1C}
+		{D112681B-6B71-4556-A138-6F68BC0A1AB1} = {27F80A25-54CF-454F-857B-A0A5782D5A1C}
 	EndGlobalSection
 EndGlobal
