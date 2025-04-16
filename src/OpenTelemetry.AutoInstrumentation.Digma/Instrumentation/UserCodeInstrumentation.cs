@@ -22,7 +22,7 @@ public class UserCodeInstrumentation
         _harmony = harmony;
         _configuration = configuration ?? ConfigurationProvider.GetConfiguration();
 
-        Logger.LogInfo("Configuration:\n" + _configuration.ToJson());
+        Logger.LogInfo("Configuration:\n" + ConfigurationProvider.ToJson(_configuration));
     }
     
     public void Instrument(Assembly assembly)

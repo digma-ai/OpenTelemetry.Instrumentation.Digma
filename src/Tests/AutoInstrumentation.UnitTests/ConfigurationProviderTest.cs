@@ -12,6 +12,7 @@ public sealed class ConfigurationProviderTest
         var config = ConfigurationProvider.GetConfiguration();
         config.Include.Should().BeEmpty();
         config.Exclude.Should().BeEmpty();
+        ConfigurationProvider.ToJson(config).Should().NotBeEmpty();
     }
     
     [TestMethod]

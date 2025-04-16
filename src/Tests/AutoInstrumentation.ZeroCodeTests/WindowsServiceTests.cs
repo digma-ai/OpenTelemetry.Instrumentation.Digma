@@ -31,6 +31,34 @@ public class WindowsServiceTests
     }
     
     [TestMethod]
+    public void Sanity_ConsoleApp_NetFramework47()
+    {
+        var exeFilePath = Path.GetFullPath(@"..\..\..\..\AutoInstrumentation.ConsoleAppNetFramework\bin\Debug\AutoInstrumentation.ConsoleAppNetFramework.exe");
+        _windowsServiceManager.CreateService(_serviceName, exeFilePath, 0);
+        _windowsServiceManager.InstrumentService(_serviceName, 
+            $"http://localhost:{OtelCollectorInitializer.Port}/v1/traces/" , 
+            "http/protobuf");
+
+        Retry.Do(() =>
+        {
+            var spans = OtelCollectorInitializer.GetSpans(_serviceName);
+
+            var span = spans.FirstOrDefault(x => x.Scope.Name == "UsersRepository" && x.Span.Name == "GetAllUsers")
+                ?.Span;
+
+            span.Should().NotBeNull();
+            
+            span.Attributes.Should().ContainSingle(x =>
+                x.Key == "code.namespace" &&
+                x.Value.StringValue == "AutoInstrumentation.ConsoleAppNetFramework.UsersRepository");
+            
+            span.Attributes.Should().ContainSingle(x =>
+                x.Key == "code.function" &&
+                x.Value.StringValue == "GetAllUsers");
+        });
+    }
+         
+    [TestMethod]
     public async Task Sanity_Net8()
     {
         var exeFilePath = Path.GetFullPath(@"..\..\..\..\AutoInstrumentation.WindowsServiceSampleApp\bin\Debug\net8.0\AutoInstrumentation.WindowsServiceSampleApp.exe");

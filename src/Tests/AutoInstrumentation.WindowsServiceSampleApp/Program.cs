@@ -1,9 +1,6 @@
 ﻿using System.Reflection;
-using System.Runtime.InteropServices;
 using AutoInstrumentation.WindowsServiceSampleApp;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 
@@ -25,14 +22,9 @@ try
         
     if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("SERVICE_NAME")))
     {
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            builder = builder.UseWindowsService();
-        }
-        // else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-        // {
-        //     builder = builder.UseSystemd();
-        // }
+        builder = builder
+            .UseWindowsService()
+            .UseSystemd();
     }
     
     var app = builder
