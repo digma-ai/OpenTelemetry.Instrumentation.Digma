@@ -1,4 +1,4 @@
-﻿namespace AutoInstrumentation.WindowsServiceSampleApp;
+﻿namespace AutoInstrumentation.WebAppDotNet;
 
 interface IUsersRepository
 {

@@ -1,5 +1,5 @@
 ﻿using System.Reflection;
-using AutoInstrumentation.WindowsServiceSampleApp;
+using AutoInstrumentation.WebAppDotNet;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Serilog;

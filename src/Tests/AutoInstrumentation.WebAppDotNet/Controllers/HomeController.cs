@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace AutoInstrumentation.WindowsServiceSampleApp.Controllers;
+namespace AutoInstrumentation.WebAppDotNet.Controllers;
 
 [ApiController]
 [Route("/")]

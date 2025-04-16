@@ -17,7 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoInstrumentation.UnitTes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoInstrumentation.IntegrationTests", "src\Tests\AutoInstrumentation.IntegrationTests\AutoInstrumentation.IntegrationTests.csproj", "{E4E70C20-C27F-4B8A-AD67-AD6070D3E217}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoInstrumentation.WindowsServiceSampleApp", "src\Tests\AutoInstrumentation.WindowsServiceSampleApp\AutoInstrumentation.WindowsServiceSampleApp.csproj", "{A270DB1B-DACB-4C22-B8C7-79A247D574F4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoInstrumentation.WebAppDotNet", "src\Tests\AutoInstrumentation.WebAppDotNet\AutoInstrumentation.WebAppDotNet.csproj", "{A270DB1B-DACB-4C22-B8C7-79A247D574F4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoInstrumentation.ZeroCodeTests", "src\Tests\AutoInstrumentation.ZeroCodeTests\AutoInstrumentation.ZeroCodeTests.csproj", "{C05B4989-5E3A-43B9-8F6B-A7C3C13760E4}"
 EndProject

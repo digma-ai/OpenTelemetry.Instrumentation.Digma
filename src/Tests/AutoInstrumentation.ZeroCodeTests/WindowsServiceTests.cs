@@ -61,14 +61,14 @@ public class WindowsServiceTests
     [TestMethod]
     public async Task Sanity_Net8()
     {
-        var exeFilePath = Path.GetFullPath(@"..\..\..\..\AutoInstrumentation.WindowsServiceSampleApp\bin\Debug\net8.0\AutoInstrumentation.WindowsServiceSampleApp.exe");
+        var exeFilePath = Path.GetFullPath(@"..\..\..\..\AutoInstrumentation.WebAppDotNet\bin\Debug\net8.0\AutoInstrumentation.WebAppDotNet.exe");
         await RunSanity(exeFilePath);
     }
                 
     [TestMethod]
     public async Task Sanity_Net9()
     {
-        var exeFilePath = Path.GetFullPath(@"..\..\..\..\AutoInstrumentation.WindowsServiceSampleApp\bin\Debug\net9.0\AutoInstrumentation.WindowsServiceSampleApp.exe");
+        var exeFilePath = Path.GetFullPath(@"..\..\..\..\AutoInstrumentation.WebAppDotNet\bin\Debug\net9.0\AutoInstrumentation.WebAppDotNet.exe");
         await RunSanity(exeFilePath);
     }
     
@@ -96,7 +96,7 @@ public class WindowsServiceTests
             
             span.Attributes.Should().ContainSingle(x =>
                 x.Key == "code.namespace" &&
-                x.Value.StringValue == "AutoInstrumentation.WindowsServiceSampleApp.UsersRepository");
+                x.Value.StringValue == "AutoInstrumentation.WebAppDotNet.UsersRepository");
             
             span.Attributes.Should().ContainSingle(x =>
                 x.Key == "code.function" &&
@@ -110,7 +110,7 @@ public class WindowsServiceTests
             
             span2.Attributes.Should().ContainSingle(x =>
                 x.Key == "code.namespace" &&
-                x.Value.StringValue == "AutoInstrumentation.WindowsServiceSampleApp.Controllers.HomeController");
+                x.Value.StringValue == "AutoInstrumentation.WebAppDotNet.Controllers.HomeController");
             
             span2.Attributes.Should().ContainSingle(x =>
                 x.Key == "code.function" &&
