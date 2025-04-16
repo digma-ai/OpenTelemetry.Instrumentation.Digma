@@ -11,12 +11,19 @@ namespace OpenTelemetry.AutoInstrumentation.Digma.Instrumentation;
 public class AspNetInstrumentation : IDisposable
 {
     private readonly DiagnosticSubscriber _observer = new();
-    
-    public AspNetInstrumentation()
+
+    public void Instrument()
     {
-        _observer.Subscribe();
+        try
+        {
+            _observer.Subscribe();
+        }
+        catch (Exception e)
+        {
+            Logger.LogError("Failed to subscribe DiagnosticSubscriber", e);
+        }
     }
-    
+
     public void Dispose()
     {
         _observer.Dispose();
@@ -45,9 +52,16 @@ public class AspNetInstrumentation : IDisposable
         {
             if(value.Name != "Microsoft.AspNetCore")
                 return;
-            
-            var subscription = value.Subscribe(_diagnosticObserver);
-            _subscriptions.Add(subscription);
+
+            try
+            {
+                var subscription = value.Subscribe(_diagnosticObserver);
+                _subscriptions.Add(subscription);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError("Failed to subscribe HttpEndpointDiagnosticObserver", e);
+            }
         }
 
         public void Dispose()
@@ -75,23 +89,29 @@ public class AspNetInstrumentation : IDisposable
         {
             if (pair.Key != "Microsoft.AspNetCore.Routing.EndpointMatched")
                 return;
-            
-            var httpContext = (HttpContext) pair.Value;
-            if(httpContext == null)
-                return;
-            
-            var endpointFeature = httpContext.Features?.Get<IEndpointFeature>();
-            var descriptor = endpointFeature?.Endpoint.Metadata.GetMetadata<ControllerActionDescriptor>();
-            if (descriptor == null)  
-                return;
-            
-            var classFullName = descriptor.ControllerTypeInfo.FullName;
-            var methodName = descriptor.MethodInfo.Name;
-            var methodParams = DigmaSemanticConventions.BuildMethodParameterTypes(descriptor.MethodInfo);
-            
-            Activity.Current?.SetTag(DigmaSemanticConventions.CodeNamespace, classFullName);
-            Activity.Current?.SetTag(DigmaSemanticConventions.CodeFunction, methodName);
-            Activity.Current?.SetTag(DigmaSemanticConventions.CodeFunctionParameterTypes, methodParams);
+            try
+            {
+                var httpContext = (HttpContext) pair.Value;
+                if (httpContext == null)
+                    return;
+
+                var endpointFeature = httpContext.Features?.Get<IEndpointFeature>();
+                var descriptor = endpointFeature?.Endpoint.Metadata.GetMetadata<ControllerActionDescriptor>();
+                if (descriptor == null)
+                    return;
+
+                var classFullName = descriptor.ControllerTypeInfo.FullName;
+                var methodName = descriptor.MethodInfo.Name;
+                var methodParams = DigmaSemanticConventions.BuildMethodParameterTypes(descriptor.MethodInfo);
+
+                Activity.Current?.SetTag(DigmaSemanticConventions.CodeNamespace, classFullName);
+                Activity.Current?.SetTag(DigmaSemanticConventions.CodeFunction, methodName);
+                Activity.Current?.SetTag(DigmaSemanticConventions.CodeFunctionParameterTypes, methodParams);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError("Failed to enrich endpoint activity", e);
+            }
         }
     }
 }

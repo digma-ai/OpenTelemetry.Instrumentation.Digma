@@ -31,6 +31,8 @@ public class AutoInstrumentor : IDisposable
         Logger.LogInfo("Sync Initialization started");
         Logger.LogInfo("Env vars:\n"+string.Join("\n", EnvVars.GetAll().Select(x => $"{x.Key}={x.Value}")));
         
+        _aspNetInstrumentation.Instrument();
+        
         AppDomain.CurrentDomain.AssemblyLoad += (sender, args) =>
         {
             Logger.LogDebug($"Processing lazy-loaded {args.LoadedAssembly.FullName}");

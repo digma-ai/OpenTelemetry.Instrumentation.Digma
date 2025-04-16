@@ -111,20 +111,20 @@ public class WindowsServiceTests
     }
          
     [TestMethod]
-    public async Task Sanity_Net8()
+    public void Sanity_WebApp_Net8()
     {
         var exeFilePath = Path.GetFullPath(@"..\..\..\..\AutoInstrumentation.WebAppDotNet\bin\Debug\net8.0\AutoInstrumentation.WebAppDotNet.exe");
-        await RunSanity(exeFilePath);
+        RunWebAppSanity(exeFilePath);
     }
                 
     [TestMethod]
-    public async Task Sanity_Net9()
+    public void Sanity_WebApp_Net9()
     {
         var exeFilePath = Path.GetFullPath(@"..\..\..\..\AutoInstrumentation.WebAppDotNet\bin\Debug\net9.0\AutoInstrumentation.WebAppDotNet.exe");
-        await RunSanity(exeFilePath);
+        RunWebAppSanity(exeFilePath);
     }
     
-    private async Task RunSanity(string exeFilePath)
+    private void RunWebAppSanity(string exeFilePath)
     {
         var port = PortUtils.GetAvailablePort();
         
@@ -135,11 +135,11 @@ public class WindowsServiceTests
         
         var client = new HttpClient();
 
-        var response = await client.GetAsync($"http://localhost:{port}");
-        response.EnsureSuccessStatusCode();
-        
         Retry.Do(() =>
         {
+            var response = client.GetAsync($"http://localhost:{port}").GetAwaiter().GetResult();
+            response.EnsureSuccessStatusCode();
+
             var spans = OtelCollectorInitializer.GetSpans(_serviceName);
             
             var span = spans.FirstOrDefault(x => x.Scope.Name == "UsersRepository" && x.Span.Name == "GetAllUsers")?.Span;

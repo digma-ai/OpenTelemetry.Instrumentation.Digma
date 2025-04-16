@@ -2,6 +2,7 @@
 using System.IO;
 using System.Reflection;
 using System.ServiceProcess;
+using OpenTelemetry.AutoInstrumentation.Digma;
 using Serilog;
 
 namespace AutoInstrumentation.ConsoleAppNetFramework
