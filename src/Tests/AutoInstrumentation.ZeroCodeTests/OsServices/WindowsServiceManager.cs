@@ -16,12 +16,13 @@ public class WindowsServiceManager
         return GetService(serviceName)?.Status == ServiceControllerStatus.Running;
     }
 
-    public void CreateService(string serviceName, string exeFilePath)
+    public void CreateService(string serviceName, string exeFilePath, int port)
     {
         RunSc("create", serviceName, "binpath=", exeFilePath);
         EditServiceEnvironmentVariables(serviceName, x =>
         {
             x["SERVICE_NAME"] = serviceName;
+            x["ASPNETCORE_URLS"] = $"http://localhost:{port}";
         });
     }
     

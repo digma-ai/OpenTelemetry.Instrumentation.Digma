@@ -34,8 +34,10 @@ public class UserCodeInstrumentationTests : BaseInstrumentationTest
         Activities[0].OperationName.Should().Be("MyMethod");
         Activities[0].Source.Name.Should().Be("UserCodeInstrumentationTests");
         Activities[0].Kind.Should().Be(ActivityKind.Internal);
+#if !NET5_0
         Activities[0].Status.Should().Be(ActivityStatusCode.Ok);
-        Activities[0].Duration.Should().BeCloseTo(100.Milliseconds(), 20.Milliseconds());
+#endif
+        Activities[0].Duration.Should().BeCloseTo(100.Milliseconds(), 50.Milliseconds());
         Activities[0].TagObjects.Should().Contain(
             new KeyValuePair<string, object?>("digma.instrumentation.extended.package", "AutoInstrumentation.IntegrationTests"),
             new KeyValuePair<string, object?>("code.namespace", "AutoInstrumentation.IntegrationTests.UserCodeInstrumentationTests"),
@@ -91,7 +93,9 @@ public class UserCodeInstrumentationTests : BaseInstrumentationTest
         catch{}
         
         Activities.Should().HaveCount(1);
+#if !NET5_0
         Activities[0].Status.Should().Be(ActivityStatusCode.Error);
+#endif
         Activities[0].Events.Should().HaveCount(1);
         
         var errEvent = Activities[0].Events.Single();

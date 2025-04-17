@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Serilog;
 
-namespace AutoInstrumentation.WindowsServiceSampleApp;
+namespace AutoInstrumentation.ConsoleAppDotNet;
 
 class Worker : BackgroundService
 {

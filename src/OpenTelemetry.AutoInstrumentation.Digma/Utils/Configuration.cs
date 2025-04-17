@@ -8,11 +8,6 @@ public class Configuration
 {
     public InstrumentationRule[] Include { get; set; } = Array.Empty<InstrumentationRule>();
     public InstrumentationRule[] Exclude { get; set; } = Array.Empty<InstrumentationRule>();
-
-    public string ToJson()
-    {
-        return JsonSerializer.Serialize(this, new JsonSerializerOptions {WriteIndented = true});
-    }
 }
 
 public class InstrumentationRule
@@ -22,10 +17,8 @@ public class InstrumentationRule
     public string Methods { get; set; }
     public bool NestedOnly { get; set; }
     
-    [JsonConverter(typeof(JsonStringEnumConverter))]
     public MethodSyncModifier? SyncModifier { get; set; }
     
-    [JsonConverter(typeof(JsonStringEnumConverter))]
     public MethodAccessModifier? AccessModifier { get; set; }
 
     public static bool IsRegex(string matcher)

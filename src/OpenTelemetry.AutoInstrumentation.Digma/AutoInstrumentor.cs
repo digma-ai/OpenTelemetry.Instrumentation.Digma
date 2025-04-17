@@ -14,6 +14,7 @@ public class AutoInstrumentor : IDisposable
     private readonly SqlClientInstrumentation _sqlClientInstrumentation;
     private readonly VerticaInstrumentation _verticaInstrumentation;
     private readonly UserCodeInstrumentation _userCodeInstrumentation;
+    private readonly AspNetInstrumentation _aspNetInstrumentation;
     private readonly HashSet<Assembly> _scannedAssemblies = new();
     
     public AutoInstrumentor(Configuration configuration = null)
@@ -22,12 +23,15 @@ public class AutoInstrumentor : IDisposable
         _sqlClientInstrumentation = new SqlClientInstrumentation(_harmony);
         _verticaInstrumentation = new VerticaInstrumentation(_harmony);
         _userCodeInstrumentation = new UserCodeInstrumentation(_harmony, configuration);
+        _aspNetInstrumentation = new AspNetInstrumentation();
     }
     
     public AutoInstrumentor Instrument()
     {
         Logger.LogInfo("Sync Initialization started");
         Logger.LogInfo("Env vars:\n"+string.Join("\n", EnvVars.GetAll().Select(x => $"{x.Key}={x.Value}")));
+        
+        _aspNetInstrumentation.Instrument();
         
         AppDomain.CurrentDomain.AssemblyLoad += (sender, args) =>
         {
@@ -71,5 +75,6 @@ public class AutoInstrumentor : IDisposable
     public void Dispose()
     {
         _harmony.UnpatchAll(_harmony.Id);
+        _aspNetInstrumentation.Dispose();
     }
 }

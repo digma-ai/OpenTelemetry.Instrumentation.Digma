@@ -11,6 +11,20 @@ static class ActivityExtensions
         activity?.SetTag(DigmaSemanticConventions.CodeNamespace, method.DeclaringType?.FullName);
         activity?.SetTag(DigmaSemanticConventions.CodeFunction, method.Name);
     }
+
+    public static void SetErrorStatus(this Activity activity)
+    {
+#if NET6_0_OR_GREATER || NETFRAMEWORK
+        activity.SetStatus(ActivityStatusCode.Error);
+#endif
+    }
+    
+    public static void SetOkStatus(this Activity activity)
+    {
+#if NET6_0_OR_GREATER || NETFRAMEWORK
+        activity.SetStatus(ActivityStatusCode.Ok);
+#endif
+    }
     
     // Taken from OpenTelemetry.Api
     public static void RecordException(this Activity activity, Exception ex)
