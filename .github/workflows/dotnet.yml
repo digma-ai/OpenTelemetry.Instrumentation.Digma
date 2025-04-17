@@ -8,18 +8,23 @@ on:
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v3
 
-    - name: Setup .NET
+    - name: Setup .NET SDKs
       uses: actions/setup-dotnet@v2
       with:
         dotnet-version: |
+          5.0.x
           6.0.x
+          7.0.x
+          8.0.x
           9.0.x
+
+    - name: Setup MSBuild (for .NET Framework)
+      uses: microsoft/setup-msbuild@v1.1
           
     - name: Restore dependencies
       run: dotnet restore
