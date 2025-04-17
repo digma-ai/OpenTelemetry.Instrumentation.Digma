@@ -27,7 +27,9 @@ jobs:
       uses: microsoft/setup-msbuild@v1.1
           
     - name: Restore dependencies
-      run: dotnet restore
+      run: |
+        dotnet restore
+        nuget restore ./src/Tests/AutoInstrumentation.ConsoleAppNetFramework.csproj
 
     - name: Build
       run: dotnet build --no-restore
