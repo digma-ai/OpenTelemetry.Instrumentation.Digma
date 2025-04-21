@@ -111,8 +111,13 @@ public class VerticaInstrumentation
         if (__exception != null)
         {
             activity.RecordException(__exception);
-            activity.SetStatus(ActivityStatusCode.Error);
-        }            
+            activity.SetErrorStatus();
+        }
+        else
+        {
+            activity.SetOkStatus();
+        } 
+        
         activity.Dispose();
         Logger.LogDebug($"Closed Activity: {activity.Source.Name}.{activity.OperationName}");
     }

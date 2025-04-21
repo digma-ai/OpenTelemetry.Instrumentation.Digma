@@ -1,8 +1,7 @@
 ﻿using System.Reflection;
-using AutoInstrumentation.WindowsServiceSampleApp;
-using Microsoft.Extensions.DependencyInjection;
+using AutoInstrumentation.WebAppDotNet;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Serilog;
 
 
@@ -18,18 +17,26 @@ Log.Logger = new LoggerConfiguration()
 try
 {
     Log.Information("Creating Host");
-    var host = Host.CreateDefaultBuilder(args)
-        .ConfigureServices(s =>
-        {
-            s.AddSingleton<IUsersRepository, UsersRepository>();
-            s.AddHostedService<Worker>();
-        })
-        .UseWindowsService()
-        .UseSystemd()
-        .Build();
 
+    var builder = Host.CreateDefaultBuilder(args);
+        
+    if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("SERVICE_NAME")))
+    {
+        builder = builder
+            .UseWindowsService()
+            .UseSystemd();
+    }
+    
+    var app = builder
+        .UseSerilog()
+        .ConfigureWebHostDefaults(webBuilder =>
+        {
+            webBuilder.UseStartup<Startup>();
+        })
+        .Build();
+  
     Log.Information("Running Host");
-    host.Run();
+    app.Run();
     Log.Information("Exited");
 }
 catch (Exception e)

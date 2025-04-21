@@ -7,7 +7,7 @@ on:
 jobs:
   publish:
     name: publish nuget
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -17,10 +17,17 @@ jobs:
         with:
           # Optionally strip `v` prefix
           strip_v: true
-      - name: Setup .NET 9.0
+      - name: Setup .NET SDKs
         uses: actions/setup-dotnet@v2
         with:
-          dotnet-version: 9.0.x
+          dotnet-version: |
+            5.0.x
+            6.0.x
+            7.0.x
+            8.0.x
+            9.0.x
+      - name: Setup MSBuild (for .NET Framework)
+        uses: microsoft/setup-msbuild@v1.1
       - uses: ./.github/workflows/composite/pack
         with:
           project: OpenTelemetry.Instrumentation.Digma

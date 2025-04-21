@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
 namespace OpenTelemetry.AutoInstrumentation.Digma.Utils;
@@ -14,8 +15,14 @@ public static class ConfigurationProvider
 
     private static readonly JsonSerializerOptions JsonSerializerOptions = new JsonSerializerOptions
     {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
+
+    public static string ToJson(Configuration configuration)
+    {
+        return JsonSerializer.Serialize(configuration, JsonSerializerOptions);
+    }
     
     public static Configuration GetConfiguration()
     {
