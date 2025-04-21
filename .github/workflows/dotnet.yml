@@ -29,7 +29,7 @@ jobs:
     - name: Restore dependencies
       run: |
         dotnet restore
-        nuget restore ./src/Tests/AutoInstrumentation.ConsoleAppNetFramework/AutoInstrumentation.ConsoleAppNetFramework.csproj
+        nuget restore ./src/Tests/AutoInstrumentation.ConsoleAppNetFramework/AutoInstrumentation.ConsoleAppNetFramework.csproj -SolutionDirectory .
 
     - name: Build
       run: dotnet build --no-restore
